@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Regole Distribuzione - Sistema OfferteWeb</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #2c3e50, #34495e);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .toolbar {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .filters {
+            background: #e9ecef;
+            padding: 15px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9rem;
+        }
+
+        .filter-input {
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            max-height: 70vh;
+            position: relative;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .data-table th {
+            background: #343a40;
+            color: white;
+            padding: 12px 8px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-right: 1px solid #495057;
+        }
+
+        .data-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #dee2e6;
+            border-right: 1px solid #dee2e6;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .data-table tbody tr.selected {
+            background-color: #d1ecf1;
+        }
+
+        .editable-cell {
+            background: none;
+            border: none;
+            width: 100%;
+            padding: 5px;
+            font-size: 0.9rem;
+        }
+
+        .editable-cell:focus {
+            background: #fff3cd;
+            outline: 2px solid #ffc107;
+            border-radius: 4px;
+        }
+
+        .listino-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .listino-piattaforme {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .listino-b2b {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .listino-collegati {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .settore-badge {
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .settore-vettura {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .settore-autocarro {
+            background: #ffd6cc;
+            color: #721c24;
+        }
+
+        .settore-motoscooter {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .status-bar {
+            background: #f8f9fa;
+            padding: 15px;
+            border-top: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: #28a745;
+        }
+
+        .notification.error {
+            background: #dc3545;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 600px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        @media (max-width: 768px) {
+            .toolbar, .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .data-table {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-cogs"></i> Gestione Regole Distribuzione</h1>
+            <p>Sistema unificato per gestire listini B2B, Piattaforme e Collegati</p>
+        </div>
+
+        <div class="toolbar">
+            <button class="btn btn-success" onclick="openAddModal()">
+                <i class="fas fa-plus"></i> Nuova Regola
+            </button>
+            <button class="btn btn-primary" onclick="saveChanges()">
+                <i class="fas fa-save"></i> Salva Modifiche
+            </button>
+            <button class="btn btn-warning" onclick="importCSV()">
+                <i class="fas fa-upload"></i> Importa CSV
+            </button>
+            <button class="btn btn-primary" onclick="exportCSV()">
+                <i class="fas fa-download"></i> Esporta CSV
+            </button>
+            <button class="btn btn-danger" onclick="deleteSelected()">
+                <i class="fas fa-trash"></i> Elimina Selezionate
+            </button>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label>Listino:</label>
+                <select id="filterListino" class="filter-input" onchange="applyFilters()">
+                    <option value="">Tutti</option>
+                    <option value="Piattaforme">Piattaforme</option>
+                    <option value="B2B">B2B</option>
+                    <option value="Collegati">Collegati</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Settore:</label>
+                <select id="filterSettore" class="filter-input" onchange="applyFilters()">
+                    <option value="">Tutti</option>
+                    <option value="Vettura">Vettura</option>
+                    <option value="Autocarro">Autocarro</option>
+                    <option value="MotoScooter">MotoScooter</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Prezzo Da:</label>
+                <input type="number" id="filterPrezzoMin" class="filter-input" onchange="applyFilters()" placeholder="€">
+            </div>
+            <div class="filter-group">
+                <label>Prezzo A:</label>
+                <input type="number" id="filterPrezzoMax" class="filter-input" onchange="applyFilters()" placeholder="€">
+            </div>
+            <div class="filter-group">
+                <label>Cerca:</label>
+                <input type="text" id="filterSearch" class="filter-input" onchange="applyFilters()" placeholder="Cerca...">
+            </div>
+            <button class="btn btn-primary" onclick="clearFilters()">
+                <i class="fas fa-times"></i> Pulisci Filtri
+            </button>
+        </div>
+
+        <div class="table-container">
+            <table class="data-table" id="dataTable">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                        <th>ID</th>
+                        <th>Listino</th>
+                        <th>Cifra In (€)</th>
+                        <th>Cifra Out (€)</th>
+                        <th>Margine (€)</th>
+                        <th>Settore</th>
+                        <th>Ricarico %</th>
+                        <th>Provv. Piatt.</th>
+                        <th>Marg- Estivo</th>
+                        <th>Marg- AS</th>
+                        <th>Marg- Invernale</th>
+                        <th>Data Modifica</th>
+                        <th>Azioni</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Dati caricati dinamicamente -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="status-bar">
+            <div>
+                <span id="recordCount">Caricate 0 regole</span> | 
+                <span id="selectedCount">0 selezionate</span>
+            </div>
+            <div>
+                <i class="fas fa-circle" style="color: #28a745;"></i> Sistema Online |
+                <span id="lastUpdate">Ultimo aggiornamento: --</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal per Aggiungere/Modificare Regola -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Nuova Regola</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <form id="editForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Listino:</label>
+                        <select id="editListino" required>
+                            <option value="">Seleziona...</option>
+                            <option value="Piattaforme">Piattaforme</option>
+                            <option value="B2B">B2B</option>
+                            <option value="Collegati">Collegati</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Settore:</label>
+                        <select id="editSettore" required>
+                            <option value="">Seleziona...</option>
+                            <option value="Vettura">Vettura</option>
+                            <option value="Autocarro">Autocarro</option>
+                            <option value="MotoScooter">MotoScooter</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Cifra In (€):</label>
+                        <input type="number" id="editCifraIn" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Cifra Out (€):</label>
+                        <input type="number" id="editCifraOut" step="0.01" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Margine (€):</label>
+                        <input type="number" id="editMargine" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Ricarico Percentuale:</label>
+                        <input type="number" id="editRicaricoPerc" step="0.001" placeholder="es: 1.25 per +25%">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Provvigione Piattaforma:</label>
+                        <input type="number" id="editProvvPiatt" step="0.0001" value="1.0130">
+                    </div>
+                    <div class="form-group">
+                        <label>Marg- (€):</label>
+                        <input type="number" id="editMargMeno" step="0.01">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Marg- Estivo (€):</label>
+                        <input type="number" id="editMargMenoEstivo" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Marg- AS (€):</label>
+                        <input type="number" id="editMargMenoAS" step="0.01">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Marg- Invernale (€):</label>
+                    <input type="number" id="editMargMenoInvernale" step="0.01">
+                </div>
+                <div style="text-align: right; margin-top: 30px;">
+                    <button type="button" class="btn btn-primary" onclick="saveRule()">
+                        <i class="fas fa-save"></i> Salva
+                    </button>
+                    <button type="button" class="btn" onclick="closeModal()" style="background: #6c757d; color: white; margin-left: 10px;">
+                        Annulla
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+        // Dati di esempio (in produzione saranno caricati dal database)
+        let regoleData = [];
+        let filteredData = [];
+        let selectedRows = new Set();
+        let editingId = null;
+
+        // Carica dati iniziali
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+        });
+
+        function loadData() {
+            // Simula caricamento dati dal database
+            // In produzione: chiamata AJAX al server
+            regoleData = [
+                {
+                    id: 1,
+                    nomeListino: 'Piattaforme',
+                    cifraIn: 0.00,
+                    cifraOut: 30.00,
+                    margine: 5.50,
+                    settore: 'Vettura',
+                    ricaricoPercentuale: null,
+                    provvPiatt: 1.0130,
+                    margMeno: 2.00,
+                    margMenoEstivo: null,
+                    margMenoAS: null,
+                    margMenoInvernale: null,
+                    dataModifica: '2025-01-02 10:30:00'
+                },
+                {
+                    id: 2,
+                    nomeListino: 'B2B',
+                    cifraIn: 0.00,
+                    cifraOut: 30.00,
+                    margine: 5.50,
+                    settore: 'Vettura',
+                    ricaricoPercentuale: null,
+                    provvPiatt: 1.0000,
+                    margMeno: 0.00,
+                    margMenoEstivo: null,
+                    margMenoAS: null,
+                    margMenoInvernale: null,
+                    dataModifica: '2025-01-02 10:30:00'
+                }
+                // Aggiungi altri dati...
+            ];
+            
+            filteredData = [...regoleData];
+            renderTable();
+            updateStatusBar();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            filteredData.forEach(regola => {
+                const row = createTableRow(regola);
+                tbody.appendChild(row);
+            });
+        }
+
+        function createTableRow(regola) {
+            const row = document.createElement('tr');
+            row.dataset.id = regola.id;
+            
+            if (selectedRows.has(regola.id)) {
+                row.classList.add('selected');
+            }
+
+            row.innerHTML = `
+                <td><input type="checkbox" onchange="toggleRowSelection(${regola.id})" ${selectedRows.has(regola.id) ? 'checked' : ''}></td>
+                <td>${regola.id}</td>
+                <td><span class="listino-badge listino-${regola.nomeListino.toLowerCase()}">${regola.nomeListino}</span></td>
+                <td><input type="number" class="editable-cell" value="${regola.cifraIn}" onchange="updateField(${regola.id}, 'cifraIn', this.value)" step="0.01"></td>
+                <td><input type="number" class="editable-cell" value="${regola.cifraOut}" onchange="updateField(${regola.id}, 'cifraOut', this.value)" step="0.01"></td>
+                <td><input type="number" class="editable-cell" value="${regola.margine}" onchange="updateField(${regola.id}, 'margine', this.value)" step="0.01"></td>
+                <td><span class="settore-badge settore-${regola.settore.toLowerCase()}">${regola.settore}</span></td>
+                <td><input type="number" class="editable-cell" value="${regola.ricaricoPercentuale || ''}" onchange="updateField(${regola.id}, 'ricaricoPercentuale', this.value)" step="0.001" placeholder="es: 1.25"></td>
+                <td><input type="number" class="editable-cell" value="${regola.provvPiatt}" onchange="updateField(${regola.id}, 'provvPiatt', this.value)" step="0.0001"></td>
+                <td><input type="number" class="editable-cell" value="${regola.margMenoEstivo || ''}" onchange="updateField(${regola.id}, 'margMenoEstivo', this.value)" step="0.01"></td>
+                <td><input type="number" class="editable-cell" value="${regola.margMenoAS || ''}" onchange="updateField(${regola.id}, 'margMenoAS', this.value)" step="0.01"></td>
+                <td><input type="number" class="editable-cell" value="${regola.margMenoInvernale || ''}" onchange="updateField(${regola.id}, 'margMenoInvernale', this.value)" step="0.01"></td>
+                <td>${formatDate(regola.dataModifica)}</td>
+                <td>
+                    <button class="btn btn-primary" onclick="editRule(${regola.id})" style="padding: 5px 10px; font-size: 0.8rem;">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteRule(${regola.id})" style="padding: 5px 10px; font-size: 0.8rem; margin-left: 5px;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+
+            return row;
+        }
+
+        function applyFilters() {
+            const filterListino = document.getElementById('filterListino').value;
+            const filterSettore = document.getElementById('filterSettore').value;
+            const filterPrezzoMin = parseFloat(document.getElementById('filterPrezzoMin').value) || 0;
+            const filterPrezzoMax = parseFloat(document.getElementById('filterPrezzoMax').value) || Infinity;
+            const filterSearch = document.getElementById('filterSearch').value.toLowerCase();
+
+            filteredData = regoleData.filter(regola => {
+                return (!filterListino || regola.nomeListino === filterListino) &&
+                       (!filterSettore || regola.settore === filterSettore) &&
+                       (regola.cifraIn >= filterPrezzoMin) &&
+                       (regola.cifraOut <= filterPrezzoMax) &&
+                       (!filterSearch || JSON.stringify(regola).toLowerCase().includes(filterSearch));
+            });
+
+            renderTable();
+            updateStatusBar();
+        }
+
+        function clearFilters() {
+            document.getElementById('filterListino').value = '';
+            document.getElementById('filterSettore').value = '';
+            document.getElementById('filterPrezzoMin').value = '';
+            document.getElementById('filterPrezzoMax').value = '';
+            document.getElementById('filterSearch').value = '';
+            applyFilters();
+        }
+
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll').checked;
+            const checkboxes = document.querySelectorAll('#tableBody input[type="checkbox"]');
+            
+            if (selectAll) {
+                filteredData.forEach(regola => selectedRows.add(regola.id));
+            } else {
+                selectedRows.clear();
+            }
+            
+            checkboxes.forEach(cb => cb.checked = selectAll);
+            updateSelectedRows();
+            updateStatusBar();
+        }
+
+        function toggleRowSelection(id) {
+            if (selectedRows.has(id)) {
+                selectedRows.delete(id);
+            } else {
+                selectedRows.add(id);
+            }
+            updateSelectedRows();
+            updateStatusBar();
+        }
+
+        function updateSelectedRows() {
+            const rows = document.querySelectorAll('#tableBody tr');
+            rows.forEach(row => {
+                const id = parseInt(row.dataset.id);
+                if (selectedRows.has(id)) {
+                    row.classList.add('selected');
+                } else {
+                    row.classList.remove('selected');
+                }
+            });
+        }
+
+        function updateField(id, field, value) {
+            const regola = regoleData.find(r => r.id === id);
+            if (regola) {
+                regola[field] = value === '' ? null : (isNaN(parseFloat(value)) ? value : parseFloat(value));
+                regola.dataModifica = new Date().toISOString().slice(0, 19).replace('T', ' ');
+                showNotification('Campo aggiornato. Ricorda di salvare le modifiche!', 'success');
+            }
+        }
+
+        function openAddModal() {
+            editingId = null;
+            document.getElementById('modalTitle').textContent = 'Nuova Regola';
+            clearForm();
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        function editRule(id) {
+            const regola = regoleData.find(r => r.id === id);
+            if (regola) {
+                editingId = id;
+                document.getElementById('modalTitle').textContent = 'Modifica Regola';
+                fillForm(regola);
+                document.getElementById('editModal').style.display = 'block';
+            }
+        }
+
+        function fillForm(regola) {
+            document.getElementById('editListino').value = regola.nomeListino;
+            document.getElementById('editSettore').value = regola.settore;
+            document.getElementById('editCifraIn').value = regola.cifraIn;
+            document.getElementById('editCifraOut').value = regola.cifraOut;
+            document.getElementById('editMargine').value = regola.margine;
+            document.getElementById('editRicaricoPerc').value = regola.ricaricoPercentuale || '';
+            document.getElementById('editProvvPiatt').value = regola.provvPiatt;
+            document.getElementById('editMargMeno').value = regola.margMeno || '';
+            document.getElementById('editMargMenoEstivo').value = regola.margMenoEstivo || '';
+            document.getElementById('editMargMenoAS').value = regola.margMenoAS || '';
+            document.getElementById('editMargMenoInvernale').value = regola.margMenoInvernale || '';
+        }
+
+        function clearForm() {
+            document.getElementById('editForm').reset();
+            document.getElementById('editProvvPiatt').value = '1.0130';
+        }
+
+        function saveRule() {
+            const formData = {
+                nomeListino: document.getElementById('editListino').value,
+                settore: document.getElementById('editSettore').value,
+                cifraIn: parseFloat(document.getElementById('editCifraIn').value),
+                cifraOut: parseFloat(document.getElementById('editCifraOut').value),
+                margine: parseFloat(document.getElementById('editMargine').value),
+                ricaricoPercentuale: parseFloat(document.getElementById('editRicaricoPerc').value) || null,
+                provvPiatt: parseFloat(document.getElementById('editProvvPiatt').value),
+                margMeno: parseFloat(document.getElementById('editMargMeno').value) || null,
+                margMenoEstivo: parseFloat(document.getElementById('editMargMenoEstivo').value) || null,
+                margMenoAS: parseFloat(document.getElementById('editMargMenoAS').value) || null,
+                margMenoInvernale: parseFloat(document.getElementById('editMargMenoInvernale').value) || null,
+                dataModifica: new Date().toISOString().slice(0, 19).replace('T', ' ')
+            };
+
+            if (editingId) {
+                const regola = regoleData.find(r => r.id === editingId);
+                Object.assign(regola, formData);
+                showNotification('Regola modificata con successo!', 'success');
+            } else {
+                formData.id = Math.max(...regoleData.map(r => r.id)) + 1;
+                regoleData.push(formData);
+                showNotification('Nuova regola aggiunta con successo!', 'success');
+            }
+
+            closeModal();
+            applyFilters();
+            updateStatusBar();
+        }
+
+        function deleteRule(id) {
+            if (confirm('Sei sicuro di voler eliminare questa regola?')) {
+                regoleData = regoleData.filter(r => r.id !== id);
+                selectedRows.delete(id);
+                applyFilters();
+                updateStatusBar();
+                showNotification('Regola eliminata con successo!', 'success');
+            }
+        }
+
+        function deleteSelected() {
+            if (selectedRows.size === 0) {
+                showNotification('Nessuna regola selezionata', 'error');
+                return;
+            }
+
+            if (confirm(`Sei sicuro di voler eliminare ${selectedRows.size} regole selezionate?`)) {
+                regoleData = regoleData.filter(r => !selectedRows.has(r.id));
+                selectedRows.clear();
+                applyFilters();
+                updateStatusBar();
+                showNotification('Regole eliminate con successo!', 'success');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+            editingId = null;
+        }
+
+        function saveChanges() {
+            // In produzione: invio dati al server
+            console.log('Salvataggio dati sul database...', regoleData);
+            showNotification('Modifiche salvate nel database!', 'success');
+            updateStatusBar();
+        }
+
+        function importCSV() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.csv';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Implementa logica di import CSV
+                    showNotification('Funzione import CSV da implementare', 'success');
+                }
+            };
+            input.click();
+        }
+
+        function exportCSV() {
+            const csvContent = generateCSV(filteredData);
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'regole_distribuzione.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showNotification('File CSV esportato!', 'success');
+        }
+
+        function generateCSV(data) {
+            const headers = ['ID', 'NomeListino', 'CifraIn', 'CifraOut', 'Margine', 'Settore', 'RicaricoPercentuale', 'ProvvPiatt', 'MargMeno', 'MargMenoEstivo', 'MargMenoAS', 'MargMenoInvernale', 'DataModifica'];
+            const csvRows = [headers.join(';')];
+            
+            data.forEach(regola => {
+                const row = [
+                    regola.id,
+                    regola.nomeListino,
+                    regola.cifraIn,
+                    regola.cifraOut,
+                    regola.margine,
+                    regola.settore,
+                    regola.ricaricoPercentuale || '',
+                    regola.provvPiatt,
+                    regola.margMeno || '',
+                    regola.margMenoEstivo || '',
+                    regola.margMenoAS || '',
+                    regola.margMenoInvernale || '',
+                    regola.dataModifica
+                ];
+                csvRows.push(row.join(';'));
+            });
+            
+            return csvRows.join('\n');
+        }
+
+        function updateStatusBar() {
+            document.getElementById('recordCount').textContent = `Caricate ${filteredData.length} regole`;
+            document.getElementById('selectedCount').textContent = `${selectedRows.size} selezionate`;
+            document.getElementById('lastUpdate').textContent = `Ultimo aggiornamento: ${new Date().toLocaleString('it-IT')}`;
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleString('it-IT');
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Chiudi modal cliccando fuori
+        window.onclick = function(event) {
+            const modal = document.getElementById('editModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Regole Distribuzione - SQL Connected</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #2c3e50, #34495e);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .connection-status {
+            background: #27ae60;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .connection-status.error {
+            background: #e74c3c;
+        }
+
+        .toolbar {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .filters {
+            background: #e9ecef;
+            padding: 15px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9rem;
+        }
+
+        .filter-input {
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            max-height: 60vh;
+            position: relative;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .data-table th {
+            background: #343a40;
+            color: white;
+            padding: 12px 8px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .data-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #dee2e6;
+            border-right: 1px solid #dee2e6;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .data-table tbody tr.selected {
+            background-color: #d1ecf1;
+        }
+
+        .data-table tbody tr.modified {
+            background-color: #fff3cd;
+        }
+
+        .editable-cell {
+            background: none;
+            border: none;
+            width: 100%;
+            padding: 5px;
+            font-size: 0.9rem;
+        }
+
+        .editable-cell:focus {
+            background: #fff3cd;
+            outline: 2px solid #ffc107;
+            border-radius: 4px;
+        }
+
+        .listino-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .listino-piattaforme {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .listino-b2b {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .listino-collegati {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-bar {
+            background: #f8f9fa;
+            padding: 15px;
+            border-top: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: #28a745;
+        }
+
+        .notification.error {
+            background: #dc3545;
+        }
+
+        .notification.warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .auto-refresh {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+        }
+
+        .auto-refresh input[type="checkbox"] {
+            transform: scale(1.2);
+        }
+
+        @media (max-width: 768px) {
+            .toolbar, .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .data-table {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-database"></i> Gestione Regole Distribuzione</h1>
+            <p>Collegamento diretto al database SQL Server</p>
+            <div id="connectionStatus" class="connection-status">
+                <i class="fas fa-wifi"></i> Connesso al database OfferteWeb
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <button class="btn btn-success" onclick="addNewRule()" id="btnAdd">
+                <i class="fas fa-plus"></i> Nuova Regola
+            </button>
+            <button class="btn btn-primary" onclick="refreshData()" id="btnRefresh">
+                <i class="fas fa-sync-alt"></i> Aggiorna
+            </button>
+            <button class="btn btn-warning" onclick="importFromCSV()" id="btnImportCSV">
+                <i class="fas fa-file-csv"></i> Importa da CSV
+            </button>
+            <button class="btn btn-danger" onclick="deleteSelected()" disabled id="btnDelete">
+                <i class="fas fa-trash"></i> Elimina Selezionate
+            </button>
+            <div class="auto-refresh">
+                <input type="checkbox" id="autoRefresh" onchange="toggleAutoRefresh()">
+                <label for="autoRefresh">Auto-refresh (30s)</label>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label>Listino:</label>
+                <select id="filterListino" class="filter-input" onchange="applyFilters()">
+                    <option value="">Tutti</option>
+                    <option value="Piattaforme">Piattaforme</option>
+                    <option value="B2B">B2B</option>
+                    <option value="Collegati">Collegati</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Settore:</label>
+                <select id="filterSettore" class="filter-input" onchange="applyFilters()">
+                    <option value="">Tutti</option>
+                    <option value="Vettura">Vettura</option>
+                    <option value="Autocarro">Autocarro</option>
+                    <option value="MotoScooter">MotoScooter</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Prezzo Da (€):</label>
+                <input type="number" id="filterPrezzoMin" class="filter-input" onchange="applyFilters()" placeholder="0.00">
+            </div>
+            <div class="filter-group">
+                <label>Prezzo A (€):</label>
+                <input type="number" id="filterPrezzoMax" class="filter-input" onchange="applyFilters()" placeholder="999.99">
+            </div>
+            <button class="btn btn-primary" onclick="clearFilters()">
+                <i class="fas fa-times"></i> Pulisci Filtri
+            </button>
+        </div>
+
+        <div class="table-container">
+            <table class="data-table" id="dataTable">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                        <th>ID</th>
+                        <th>Listino</th>
+                        <th>Cifra In (€)</th>
+                        <th>Cifra Out (€)</th>
+                        <th>Margine (€)</th>
+                        <th>Marg+</th>
+                        <th>Marg-</th>
+                        <th>Settore</th>
+                        <th>Ricarico %</th>
+                        <th>Provv. Piatt.</th>
+                        <th>Marg- Estivo</th>
+                        <th>Marg- AS</th>
+                        <th>Marg- Invernale</th>
+                        <th>Data Creazione</th>
+                        <th>Data Modifica</th>
+                        <th>Azioni</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td colspan="17" class="loading">
+                            <div class="spinner"></div>
+                            Caricamento dati dal database...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="status-bar">
+            <div>
+                <span id="recordCount">Caricamento...</span> | 
+                <span id="selectedCount">0 selezionate</span>
+            </div>
+            <div>
+                <span>API: /api/regole</span> |
+                <span id="lastUpdate">--</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+        // Variabili globali
+        let allData = [];
+        let filteredData = [];
+        let selectedRows = new Set();
+        let autoRefreshInterval = null;
+        const API_BASE = '/api';
+
+        // Inizializzazione
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+        });
+
+        // Carica dati dal database
+        async function loadData() {
+            try {
+                showLoading();
+                
+                const listino = document.getElementById('filterListino').value;
+                const settore = document.getElementById('filterSettore').value;
+                
+                let url = `${API_BASE}/regole`;
+                const params = new URLSearchParams();
+                if (listino) params.append('listino', listino);
+                if (settore) params.append('settore', settore);
+                if (params.toString()) url += '?' + params.toString();
+
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`Errore HTTP: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                allData = data;
+                filteredData = [...allData];
+                
+                renderTable();
+                updateStatusBar();
+                updateConnectionStatus(true);
+                showNotification('Dati caricati dal database!', 'success');
+                
+            } catch (error) {
+                console.error('Errore nel caricamento:', error);
+                updateConnectionStatus(false);
+                showNotification('Errore nel caricamento dei dati: ' + error.message, 'error');
+                showError('Impossibile caricare i dati dal database');
+            }
+        }
+
+        // Mostra loading
+        function showLoading() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="17" class="loading">
+                        <div class="spinner"></div>
+                        Caricamento dati dal database...
+                    </td>
+                </tr>
+            `;
+        }
+
+        // Mostra errore
+        function showError(message) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="17" style="text-align: center; padding: 40px; color: #dc3545;">
+                        <i class="fas fa-exclamation-triangle fa-3x" style="margin-bottom: 15px;"></i><br>
+                        ${message}
+                    </td>
+                </tr>
+            `;
+        }
+
+        // Rendering tabella
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            if (filteredData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="17" style="text-align: center; padding: 40px; color: #6c757d;">
+                            <i class="fas fa-search fa-2x" style="margin-bottom: 15px; opacity: 0.5;"></i><br>
+                            Nessun risultato trovato
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            filteredData.forEach(row => {
+                const tr = createTableRow(row);
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Crea riga tabella
+        function createTableRow(row) {
+            const tr = document.createElement('tr');
+            tr.dataset.id = row.ID;
+            
+            if (selectedRows.has(row.ID)) {
+                tr.classList.add('selected');
+            }
+
+            tr.innerHTML = `
+                <td><input type="checkbox" onchange="toggleRowSelection(${row.ID})" ${selectedRows.has(row.ID) ? 'checked' : ''}></td>
+                <td>${row.ID}</td>
+                <td><span class="listino-badge listino-${(row.NomeListino || '').toLowerCase()}">${row.NomeListino || ''}</span></td>
+                <td><input type="number" class="editable-cell" value="${row.CifraIn || ''}" onchange="updateField(${row.ID}, 'CifraIn', this.value)" step="0.01"></td>
+                <td><input type="number" class="editable-cell" value="${row.CifraOut || ''}" onchange="updateField(${row.ID}, 'CifraOut', this.value)" step="0.01"></td>
+                <td><input type="number" class="editable-cell" value="${row.Margine || ''}" onchange="updateField(${row.ID}, 'Margine', this.value)" step="0.01"></td>
+                <td><input type="number" class="editable-cell" value="${row.MargPiu || ''}" onchange="updateField(${row.ID}, 'MargPiu', this.value)" step="0.01"></td>
+                <td><input type="number" class="editable-cell" value="${row.MargMeno || ''}" onchange="updateField(${row.ID}, 'MargMeno', this.value)" step="0.01"></td>
+                <td>
+                    <select class="editable-cell" onchange="updateField(${row.ID}, 'Settore', this.value)">
+                        <option value="Vettura" ${row.Settore === 'Vettura' ? 'selected' : ''}>Vettura</option>
+                        <option value="Autocarro" ${row.Settore === 'Autocarro' ? 'selected' : ''}>Autocarro</option>
+                        <option value="MotoScooter" ${row.Settore === 'MotoScooter' ? 'selected' : ''}>MotoScooter</option>
+                    </select>
+                </td>
+                <td><input type="number" class="editable-cell" value="${row.RicaricoPercentuale || ''}" onchange="updateField(${row.ID}, 'RicaricoPercentuale', this.value)" step="0.001"></td>
+                <td><input type="number" class="editable-cell" value="${row.ProvvPiatt || ''}" onchange="updateField(${row.ID}, 'ProvvPiatt', this.value)" step="0.0001"></td>
+                <td><input type="number" class="editable-cell" value="${row.MargMenoEstivo || ''}" onchange="updateField(${row.ID}, 'MargMenoEstivo', this.value)" step="0.01"></td>
+                <td><input type="number" class="editable-cell" value="${row.MargMenoAS || ''}" onchange="updateField(${row.ID}, 'MargMenoAS', this.value)" step="0.01"></td>
+                <td><input type="number" class="editable-cell" value="${row.MargMenoInvernale || ''}" onchange="updateField(${row.ID}, 'MargMenoInvernale', this.value)" step="0.01"></td>
+                <td>${formatDate(row.DataCreazione)}</td>
+                <td>${formatDate(row.DataModifica)}</td>
+                <td>
+                    <button class="btn btn-danger" onclick="deleteRow(${row.ID})" style="padding: 5px 10px; font-size: 0.8rem;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+
+            return tr;
+        }
+
+        // Aggiorna campo
+        async function updateField(id, field, value) {
+            try {
+                const row = allData.find(r => r.ID === id);
+                if (!row) return;
+
+                // Prepara l'oggetto aggiornato
+                const updatedRow = { ...row };
+                updatedRow[field] = value === '' ? null : (isNaN(value) ? value : parseFloat(value));
+
+                const response = await fetch(`${API_BASE}/regole/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(updatedRow)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Errore HTTP: ${response.status}`);
+                }
+
+                // Aggiorna i dati locali
+                Object.assign(row, updatedRow);
+                row.DataModifica = new Date().toISOString();
+
+                // Marca riga come modificata
+                const rowEl = document.querySelector(`tr[data-id="${id}"]`);
+                if (rowEl) {
+                    rowEl.classList.add('modified');
+                    setTimeout(() => rowEl.classList.remove('modified'), 2000);
+                }
+
+                showNotification('Campo aggiornato nel database!', 'success');
+
+            } catch (error) {
+                console.error('Errore nell\'aggiornamento:', error);
+                showNotification('Errore nell\'aggiornamento: ' + error.message, 'error');
+                // Ricarica i dati per ripristinare lo stato
+                await loadData();
+            }
+        }
+
+        // Aggiungi nuova regola
+        async function addNewRule() {
+            try {
+                const newRow = {
+                    NomeListino: 'B2B',
+                    CifraIn: 0.00,
+                    CifraOut: 0.00,
+                    Margine: 0.00,
+                    MargPiu: 0.00,
+                    MargMeno: 0.00,
+                    Settore: 'Vettura',
+                    RicaricoPercentuale: null,
+                    ProvvPiatt: 1.0000,
+                    MargMenoEstivo: null,
+                    MargMenoAS: null,
+                    MargMenoInvernale: null
+                };
+
+                const response = await fetch(`${API_BASE}/regole`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(newRow)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Errore HTTP: ${response.status}`);
+                }
+
+                const result = await response.json();
+                showNotification('Nuova regola aggiunta al database!', 'success');
+                
+                // Ricarica i dati
+                await loadData();
+
+            } catch (error) {
+                console.error('Errore nell\'aggiunta:', error);
+                showNotification('Errore nell\'aggiunta: ' + error.message, 'error');
+            }
+        }
+
+        // Elimina riga
+        async function deleteRow(id) {
+            if (!confirm('Sei sicuro di voler eliminare questa regola dal database?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/regole/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Errore HTTP: ${response.status}`);
+                }
+
+                showNotification('Regola eliminata dal database!', 'success');
+                selectedRows.delete(id);
+                
+                // Ricarica i dati
+                await loadData();
+
+            } catch (error) {
+                console.error('Errore nell\'eliminazione:', error);
+                showNotification('Errore nell\'eliminazione: ' + error.message, 'error');
+            }
+        }
+
+        // Elimina selezionate
+        async function deleteSelected() {
+            if (selectedRows.size === 0) {
+                showNotification('Nessuna regola selezionata', 'warning');
+                return;
+            }
+
+            if (!confirm(`Sei sicuro di voler eliminare ${selectedRows.size} regole dal database?`)) {
+                return;
+            }
+
+            try {
+                const deletePromises = Array.from(selectedRows).map(id => 
+                    fetch(`${API_BASE}/regole/${id}`, { method: 'DELETE' })
+                );
+
+                await Promise.all(deletePromises);
+                
+                showNotification(`${selectedRows.size} regole eliminate dal database!`, 'success');
+                selectedRows.clear();
+                
+                // Ricarica i dati
+                await loadData();
+
+            } catch (error) {
+                console.error('Errore nell\'eliminazione multipla:', error);
+                showNotification('Errore nell\'eliminazione: ' + error.message, 'error');
+            }
+        }
+
+        // Importa da CSV
+        async function importFromCSV() {
+            if (!confirm('Importare i dati dal file CSV presente in C:\\Antonio\\RegoleB2bPerSoldi\\...?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/import-csv`, {
+                    method: 'POST'
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.Message || 'Errore durante l\'importazione');
+                }
+
+                showNotification(result.Message, 'success');
+                
+                // Ricarica i dati
+                await loadData();
+
+            } catch (error) {
+                console.error('Errore nell\'importazione:', error);
+                showNotification('Errore nell\'importazione: ' + error.message, 'error');
+            }
+        }
+
+        // Aggiorna dati
+        async function refreshData() {
+            await loadData();
+        }
+
+        // Applica filtri (solo locali, il server fa il filtro principale)
+        function applyFilters() {
+            // Per filtri più complessi, puoi ricaricare dal server
+            // Per ora applichiamo filtri solo locali su prezzo
+            const prezzoMin = parseFloat(document.getElementById('filterPrezzoMin').value) || 0;
+            const prezzoMax = parseFloat(document.getElementById('filterPrezzoMax').value) || Infinity;
+
+            filteredData = allData.filter(row => {
+                return (row.CifraIn >= prezzoMin) && (row.CifraOut <= prezzoMax);
+            });
+
+            renderTable();
+            updateStatusBar();
+        }
+
+        // Pulisci filtri
+        function clearFilters() {
+            document.getElementById('filterListino').value = '';
+            document.getElementById('filterSettore').value = '';
+            document.getElementById('filterPrezzoMin').value = '';
+            document.getElementById('filterPrezzoMax').value = '';
+            loadData(); // Ricarica senza filtri
+        }
+
+        // Toggle auto refresh
+        function toggleAutoRefresh() {
+            const enabled = document.getElementById('autoRefresh').checked;
+            
+            if (enabled) {
+                autoRefreshInterval = setInterval(loadData, 30000); // 30 secondi
+                showNotification('Auto-refresh attivato (30s)', 'success');
+            } else {
+                if (autoRefreshInterval) {
+                    clearInterval(autoRefreshInterval);
+                    autoRefreshInterval = null;
+                }
+                showNotification('Auto-refresh disattivato', 'warning');
+            }
+        }
+
+        // Toggle selezione riga
+        function toggleRowSelection(id) {
+            if (selectedRows.has(id)) {
+                selectedRows.delete(id);
+            } else {
+                selectedRows.add(id);
+            }
+            
+            updateDeleteButton();
+            updateStatusBar();
+        }
+
+        // Toggle seleziona tutto
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll').checked;
+            const checkboxes = document.querySelectorAll('#tableBody input[type="checkbox"]');
+            
+            if (selectAll) {
+                filteredData.forEach(row => selectedRows.add(row.ID));
+            } else {
+                selectedRows.clear();
+            }
+            
+            checkboxes.forEach(cb => cb.checked = selectAll);
+            updateDeleteButton();
+            updateStatusBar();
+        }
+
+        // Aggiorna pulsante elimina
+        function updateDeleteButton() {
+            document.getElementById('btnDelete').disabled = selectedRows.size === 0;
+        }
+
+        // Aggiorna status bar
+        function updateStatusBar() {
+            document.getElementById('recordCount').textContent = `${filteredData.length} regole visualizzate (${allData.length} totali)`;
+            document.getElementById('selectedCount').textContent = `${selectedRows.size} selezionate`;
+            document.getElementById('lastUpdate').textContent = `Ultimo aggiornamento: ${new Date().toLocaleString('it-IT')}`;
+        }
+
+        // Aggiorna stato connessione
+        function updateConnectionStatus(connected) {
+            const statusEl = document.getElementById('connectionStatus');
+            if (connected) {
+                statusEl.className = 'connection-status';
+                statusEl.innerHTML = '<i class="fas fa-wifi"></i> Connesso al database OfferteWeb';
+            } else {
+                statusEl.className = 'connection-status error';
+                statusEl.innerHTML = '<i class="fas fa-wifi"></i> Errore di connessione al database';
+            }
+        }
+
+        // Formatta data
+        function formatDate(dateString) {
+            if (!dateString) return '--';
+            return new Date(dateString).toLocaleString('it-IT');
+        }
+
+        // Mostra notifica
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+    </script>
+</body>
+</html> 

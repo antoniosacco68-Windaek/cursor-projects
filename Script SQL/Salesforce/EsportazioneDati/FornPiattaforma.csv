@@ -1,0 +1,34 @@
+﻿IdForPiatt;Codice;Descrizione;CodArtNonI24;IdArtGen;TipoListinoAutocarro_old;Art1Pos;ArtTotali;Perc1Pos;ArtInStockCsv;CatForn;PubPortali;DimensioneFile;DataFile;AttivaFerie;NoteForn;DropShipping;SpeseTrasporto;GiorniConsegna;SpesaAssociata;NrArticoliMinimo;EscludiDaT24;EscludiDaPdv;Chisura
+1;IST;InterServiceTrade;null;null;null;0;0;0;0;Forn_Estero;72H;null;null;True;null;True;False;4;0.00;10000;False;False;0x0000000691FD7774
+2;TOY;Toyo;null;null;null;0;0;0;0;Forn_Italia;48H;null;null;True;null;False;True;2;0.00;250;False;False;0x0000000691FD7761
+3;UNI;Univergomma;null;null;null;1572;0;15;10375;Forn_Italia;48H;4889861;17/06/2025 01:18:31;False;null;False;True;2;0.00;6000;False;False;0x0000000691FD7895
+4;BGD;BgDistribuzione;null;null;null;705;0;85;829;Nostre_Bgd;24H;null;null;False;null;False;True;1;0.00;600;False;False;0x0000000691FD7896
+5;T24;Tyre24;null;null;null;0;0;0;0;Forn_Estero;72H;null;null;True;null;True;False;4;3.00;0;False;False;0x0000000691FD7775
+6;LDC;LDC;null;null;null;0;0;0;0;Logistica_Ldc;48H;null;null;True;null;False;True;1;0.00;0;False;False;0x0000000691FD7763
+7;VEL;Velorama;null;null;null;164;0;88;185;Forn_Italia;48H;182652;16/06/2025 19:15:04;False;null;False;True;2;0.00;90;False;False;0x0000000691FD7897
+8;PDV;Pdv;null;null;null;204;0;47;432;Nostre_Pdv;48H;null;null;False;null;False;True;2;0.00;150;False;False;0x0000000691FD7898
+9;COG;ContinentalGer;null;null;null;0;0;0;0;Forn_Estero;72H_CST;null;null;True;null;False;True;4;0.00;200;False;False;0x0000000691FD7780
+10;GOE;GOEGGEL;null;null;null;0;0;0;0;Forn_Estero;72H;null;null;True;null;True;False;4;3.00;900;False;False;0x0000000691FD7776
+11;GUN;Gundlach;null;null;null;1378;0;24;5712;Forn_Estero;72H;2330580;17/06/2025 07:29:41;False;null;True;False;4;3.00;300;False;False;0x0000000691FD7899
+12;DEL;Deldo;null;null;null;1775;0;51;3444;Forn_Estero;72H;1011064;17/06/2025 06:05:55;False;null;True;False;4;3.00;1700;False;False;0x0000000691FD789A
+13;FRC;FrancoGomme;null;null;null;5984;0;47;12624;Forn_Italia;48H;4614778;17/06/2025 07:01:04;False;Non la Passiamo a T24 GER;False;True;2;0.00;3500;False;False;0x0000000691FD789B
+14;LLT;LowLands;null;null;null;3687;0;94;3917;Forn_Estero;72H;1331142;17/06/2025 07:26:19;False;null;False;False;4;3.00;0;False;True;0x0000000691FD789C
+15;FIN;Fintyre;null;null;null;1494;0;13;10930;Forn_Italia;48H;4768808;17/06/2025 07:04:34;False;null;False;True;2;0.00;0;False;False;0x0000000691FD789D
+16;YOK;Yokohama;null;null;null;235;0;61;385;Forn_Italia;48H;64189;17/06/2025 07:25:02;False;null;False;True;2;0.00;180;False;False;0x0000000691FD789E
+17;CON;ContinentalWeb;null;null;null;1436;0;60;2356;Forn_Italia;48H;404921;16/06/2025 16:03:40;False;null;False;True;2;0.00;1200;False;False;0x0000000691FD789F
+18;TAG;Tagliabue;null;null;null;1994;0;23;8652;Forn_Italia;48H;1612133;17/06/2025 06:55:00;False;null;False;True;2;0.00;120;False;False;0x0000000691FD78A0
+19;BRI;Bridgestone;null;null;null;1270;0;67;1884;Forn_Italia;48H;198858;17/06/2025 06:16:29;False;null;False;True;2;0.00;1200;False;False;0x0000000691FD78A1
+20;GOO;GoodyearWeb;null;null;null;1036;0;51;2012;Forn_Italia;48H;134739;16/06/2025 14:12:00;False;null;False;True;2;0.00;880;False;False;0x0000000691FD78A2
+21;PNE;ETyre;null;null;null;0;0;0;0;Forn_Estero;72H;null;null;True;null;True;False;4;3.00;0;False;False;0x0000000691FD777A
+22;DET;Delticom;null;null;null;0;0;0;0;Forn_Estero;72H;null;null;True;null;True;False;4;0.00;0;True;False;0x0000000691FD777B
+23;99;Barigazzi;null;null;null;0;0;0;0;Forn_Cerchi;48H;null;null;True;null;False;True;2;0.00;0;False;False;0x0000000691FD776D
+24;HAN;Hankook;null;null;null;627;0;56;1114;Forn_Italia;48H;153078;17/06/2025 06:12:05;False;null;False;True;2;0.00;300;False;False;0x0000000691FD78A3
+25;AND;GroupAndres;null;null;null;0;0;0;0;Forn_Estero;72H;null;null;True;null;True;False;4;3.00;0;False;False;0x0000000691FD777C
+26;NEX;Nexen;null;null;null;320;0;36;888;Forn_Italia;48H;151138;17/06/2025 05:25:12;False;null;False;True;2;0.00;0;False;False;0x0000000691FD78A4
+27;KK;KK Raeder;##KK;584265;null;0;0;0;0;Forn_Estero;72H;null;null;True;null;True;False;4;3.00;0;False;False;0x0000000691FD777D
+28;PIR;PIRELLI;null;null;null;350;0;79;443;Forn_Italia;48H;80523;17/06/2025 07:05:04;False;null;False;True;2;0.00;140;False;False;0x0000000691FD78A5
+29;MIC;Michelin;null;null;null;1256;0;71;1767;Forn_Italia;48H;275665;17/06/2025 07:09:45;False;null;False;True;2;0.00;500;False;False;0x0000000691FD78A6
+30;KUM;Kumho;null;null;null;167;0;29;562;Forn_Italia;48H;271027;17/06/2025 07:31:35;False;null;False;True;2;0.00;150;False;False;0x0000000691FD78A7
+31;FAL;Falken;null;null;null;457;0;67;675;Forn_Italia;48H;49289;17/06/2025 07:31:57;False;null;False;True;2;0.00;350;False;False;0x0000000691FD78A8
+32;INR;InReifen;null;null;null;17822;0;47;37240;Forn_Estero;72H;9281721;16/06/2025 07:05:11;False;null;True;False;4;3.00;0;True;False;0x0000000691FD78A9
+33;GOM;Gommerio Rotyre;null;null;null;8;0;100;8;Forn_Estero;72H;11943506;17/06/2025 07:32:07;False;null;True;False;4;0.00;null;True;False;0x0000000691FD78AA

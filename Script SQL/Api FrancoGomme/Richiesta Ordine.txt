@@ -1,0 +1,33 @@
+‹?xml version="1.0" encoding="UTF-8"?>
+‹ns1:order_A2 xmlns:ns1="http://www.reifen.net">
+<DocumentID>B2</DocumentID>
+‹ Variant>5</Variant>
+‹ CustomerReference >
+<DocumentID>4504533880</DocumentID>
+</CustomerReference >
+‹BuyerParty>
+<PartyID>250224</PartyID>
+‹AgencyCodes91‹/Agencycode»
+</BuyerParty>
+‹ Consignee >
+<PartyID>250224</PartyID>
+<AgencyCode>91</AgencyCode>
+‹Name>Fintyre gomme SRL</Name >
+‹Street>STRADA STRETTA, 20</Street>
+‹Caty›SERRAVALLE - REPUBBLICA SAN MARINO</City 3
+<PostCode>47899</PostCode>
+‹CountryCode>SM</CountryCode >
+</Address>
+‹/Consignee >
+‹OrderLine >
+<LineID>000001</LineID>
+‹OrderedArticle ›
+‹ArticleIdentification›
+‹ManufacturersArticleID>NANAA0048</ManufacturersArticleID>
+‹/ArticleIdentification>
+‹ RequestedQuantity >
+‹QuantityValue>4</QuantityValue >
+‹/RequestedQuantity›
+‹/OrderedArticle ›
+‹/OrderLine >
+</ns1:order_A2>

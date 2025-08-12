@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PrezziManualiDistribuzioneIT>
+  <Articolo>
+    <Art_Id>39555</Art_Id>
+    <ART_CODICE>2255016-BRI-77321</ART_CODICE>
+    <classificatore3>16</classificatore3>
+    <Descrizione>225/50R16 92V Runflat BRIDGESTONE RE050 BZ RFT BRIDGESTON</Descrizione>
+    <MARCA>BRIDGESTONE</MARCA>
+    <ART_STAGIONE>ESTIVO</ART_STAGIONE>
+    <PM_Std>0</PM_Std>
+    <PM_T24>0</PM_T24>
+    <PM_B2b>0</PM_B2b>
+    <PM_Collegati>0</PM_Collegati>
+    <PM_Std_Data></PM_Std_Data>
+    <PM_T24_Data></PM_T24_Data>
+    <PM_B2b_Data></PM_B2b_Data>
+    <PM_Collegati_Data></PM_Collegati_Data>
+  </Articolo>
+  <Articolo>
+    <Art_Id>39567</Art_Id>
+    <ART_CODICE>1955516-GOO-516814</ART_CODICE>
+    <classificatore3>16</classificatore3>
+    <Descrizione>195/55R16 87H Runflat GOODYEAR EAGLE NCT5</Descrizione>
+    <MARCA>GOODYEAR</MARCA>
+    <ART_STAGIONE>ESTIVO</ART_STAGIONE>
+    <PM_Std>15.50</PM_Std>
+    <PM_T24>18.00</PM_T24>
+    <PM_B2b>20.00</PM_B2b>
+    <PM_Collegati>17.75</PM_Collegati>
+    <PM_Std_Data>2024-01-15</PM_Std_Data>
+    <PM_T24_Data>2024-01-16</PM_T24_Data>
+    <PM_B2b_Data>2024-01-17</PM_B2b_Data>
+    <PM_Collegati_Data>2024-01-18</PM_Collegati_Data>
+  </Articolo>
+  <!-- ... altri articoli ... -->
+</PrezziManualiDistribuzioneIT> 

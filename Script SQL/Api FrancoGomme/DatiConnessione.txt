@@ -1,0 +1,5 @@
+TEST
+
+• link: https://ws.francogomme.it/wsFrancogommeTest/[Inquiry | OrderB2]
+• username: B0logn4Test
+• password: B0logna#2025

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esempio Form Avada per Bologna Gomme</title>
+    <style>
+        /* Stili di base simili a quelli del form CF7 */
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .inline-fields {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .inline-fields > div {
+            flex: 1;
+            min-width: 200px;
+        }
+        .main-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .tire-size-container {
+            margin-bottom: 10px;
+        }
+        .tire-size-selectors {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .tire-select-group {
+            flex-grow: 1;
+            flex-basis: calc(20% - 10px);
+            min-width: calc(20% - 10px);
+        }
+        .tire-select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .preventivo-group.hidden {
+            display: none;
+        }
+        .checkbox-contatti {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        @media (max-width: 768px) {
+            .tire-size-selectors {
+                flex-direction: column;
+            }
+            .tire-select-group {
+                width: 100%;
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Implementazione Form Avada per Bologna Gomme</h1>
+    
+    <div class="implementation-notes">
+        <h2>Note di Implementazione per Avada Form Builder</h2>
+        <p>Questo esempio mostra come adattare il modulo Contact Form 7 per usarlo con l'Avada Form Builder. Di seguito i passaggi principali:</p>
+        <ol>
+            <li>Creare un nuovo form Avada da Dashboard > Avada > Forms > Add New</li>
+            <li>Impostare la struttura del form usando container e colonne come mostrato sotto</li>
+            <li>Aggiungere gli script JavaScript nella sezione "Custom JS" delle opzioni del form Avada</li>
+            <li>Configurare le notifiche email nelle opzioni del form Avada</li>
+        </ol>
+    </div>
+
+    <h2>Struttura del form in Avada Form Builder</h2>
+    
+    <div class="avada-implementation">
+        <h3>1. Container principale - 1 colonna</h3>
+        <ul>
+            <li>Text Element: Titolo del form (facoltativo)</li>
+        </ul>
+
+        <h3>2. Container - 2 colonne</h3>
+        <ul>
+            <li>Colonna 1: Input Text Element - Nome (required)</li>
+            <li>Colonna 2: Input Text Element - Cognome (required)</li>
+        </ul>
+
+        <h3>3. Container - 3 colonne</h3>
+        <ul>
+            <li>Colonna 1: Input Text Element - Email (required)</li>
+            <li>Colonna 2: Input Text Element - Telefono (required)</li>
+            <li>Colonna 3: Input Text Element - CAP</li>
+        </ul>
+
+        <h3>4. Container - 3 colonne</h3>
+        <ul>
+            <li>Colonna 1: Input Text Element - Targa veicolo</li>
+            <li>Colonna 2: Input Text Element - Marca veicolo</li>
+            <li>Colonna 3: Input Text Element - Modello veicolo</li>
+        </ul>
+
+        <h3>5. Container - 1 colonna</h3>
+        <ul>
+            <li>Select Element - Tipologia preventivo (id: tipo-preventivo, class: preventivo-selector)
+                <ul>
+                    <li>Opzione: - - Tipologia preventivo - -</li>
+                    <li>Opzione: PREVENTIVO PNEUMATICI</li>
+                    <li>Opzione: PREVENTIVO MECCANICA</li>
+                    <li>Opzione: PREVENTIVO PNEUMATICI MOTO</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>6. Container - 1 colonna (id: preventivo_pneumatici, class: preventivo-group preventivo_pneumatici hidden)</h3>
+        <ul>
+            <li>Text Element: &lt;div class="form-group tire-size-container"&gt;
+                &lt;label class="main-label"&gt;Misura pneumatici&lt;/label&gt;
+                &lt;div class="tire-size-selectors"&gt;
+                  &lt;div class="tire-select-group"&gt;
+                       &lt;label for="larghezza-pneumatico"&gt;Larghezza&lt;/label&gt;
+                       &lt;select id="larghezza-pneumatico" class="tire-select"&gt;
+                           &lt;option value=""&gt;Larghezza&lt;/option&gt;
+                           &lt;option value="155"&gt;155&lt;/option&gt;
+                           &lt;option value="165"&gt;165&lt;/option&gt;
+                           &lt;!-- altre opzioni larghezza --&gt;
+                       &lt;/select&gt;
+                  &lt;/div&gt;
+                  &lt;div class="tire-select-group"&gt;
+                     &lt;label for="sezione-pneumatico"&gt;Spalla&lt;/label&gt;
+                       &lt;select id="sezione-pneumatico" class="tire-select"&gt;
+                           &lt;option value=""&gt;Spalla&lt;/option&gt;
+                           &lt;!-- opzioni spalla verranno popolate via JavaScript --&gt;
+                       &lt;/select&gt;
+                  &lt;/div&gt;
+                   &lt;div class="tire-select-group"&gt;
+                       &lt;label for="diametro-pneumatico"&gt;Diametro&lt;/label&gt;
+                       &lt;select id="diametro-pneumatico" class="tire-select"&gt;
+                           &lt;option value=""&gt;Diametro&lt;/option&gt;
+                           &lt;!-- opzioni diametro verranno popolate via JavaScript --&gt;
+                       &lt;/select&gt;
+                  &lt;/div&gt;
+                 &lt;div class="tire-select-group"&gt;
+                      &lt;label for="carico-pneumatico"&gt;Carico&lt;/label&gt;
+                      &lt;select id="carico-pneumatico" class="tire-select"&gt;
+                           &lt;option value=""&gt;Carico&lt;/option&gt;
+                           &lt;!-- opzioni carico verranno popolate via JavaScript --&gt;
+                      &lt;/select&gt;
+                   &lt;/div&gt;
+                  &lt;div class="tire-select-group"&gt;
+                       &lt;label for="velocita-pneumatico"&gt;Velocità&lt;/label&gt;
+                       &lt;select id="velocita-pneumatico" class="tire-select"&gt;
+                           &lt;option value=""&gt;Velocità&lt;/option&gt;
+                           &lt;!-- opzioni velocità verranno popolate via JavaScript --&gt;
+                       &lt;/select&gt;
+                  &lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;</li>
+            <li>Select Element - Stagionalità Pneumatici 
+                <ul>
+                    <li>Opzione: - - Stagionalità Pneumatici - -</li>
+                    <li>Opzione: ESTIVE</li>
+                    <li>Opzione: INVERNALI</li>
+                    <li>Opzione: QUATTRO STAGIONI</li>
+                </ul>
+            </li>
+            <li>Select Element - Numero Pneumatici
+                <ul>
+                    <li>Opzione: - - Nr Pneumatici - -</li>
+                    <li>Opzione: 1</li>
+                    <li>Opzione: 2</li>
+                    <li>Opzione: 3</li>
+                    <li>Opzione: 4</li>
+                </ul>
+            </li>
+            <li>Select Element - Fascia Prezzo Pneumatici
+                <ul>
+                    <li>Opzione: - - Fascia Prezzo Pneumatico - -</li>
+                    <li>Opzione: CLASSE T1 PREMIUM</li>
+                    <li>Opzione: CLASSE T2 MEDIUM</li>
+                    <li>Opzione: CLASSE T3 ECONOMY</li>
+                    <li>Opzione: CLASSE T4 USATE</li>
+                    <li>Opzione: CLASSE T5 LE NOSTRE PROPOSTE</li>
+                </ul>
+            </li>
+        </ul>
+
+        <!-- Altri container simili per preventivo_pneumatici_moto e preventivo_meccanica -->
+
+        <h3>10. Container - 1 colonna</h3>
+        <ul>
+            <li>Select Element - Seleziona un centro
+                <ul>
+                    <li>Opzione: - - Seleziona un centro - -</li>
+                    <li>Opzione: BG1-BARGELLINO (Bologna)</li>
+                    <li>Opzione: BG2-BORGO PANIGALE (Bologna)</li>
+                    <li>Opzione: BG3-VILLANOVA (Castenaso)</li>
+                    <li>Opzione: BG4-PONTE RIZZOLI (Ozzano Emilia)</li>
+                    <li>Opzione: BG5-CASTEL GUELFO (Bologna)</li>
+                    <li>Opzione: BG6-CASTEL SAN PIETRO (Bologna)</li>
+                    <li>Opzione: BG7-FUNO DI ARGELATO (Bologna)</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h3>11. Container - 1 colonna</h3>
+        <ul>
+            <li>Textarea Element - Testo della tua richiesta</li>
+        </ul>
+
+        <h3>12. Container - 1 colonna</h3>
+        <ul>
+            <li>Checkbox Element - Privacy (required)</li>
+        </ul>
+
+        <h3>13. Container - 1 colonna</h3>
+        <ul>
+            <li>Checkbox Element - Newsletter</li>
+        </ul>
+
+        <h3>14. Container - 1 colonna</h3>
+        <ul>
+            <li>Submit Button Element - Invia Richiesta</li>
+        </ul>
+    </div>
+
+    <h2>JavaScript per la funzionalità di filtro (inserire in Avada Form Options > Custom CSS/JS > JavaScript)</h2>
+    <pre style="background-color: #f5f5f5; padding: 15px; overflow: auto; max-height: 500px;">
+// Database pneumatici
+const tireDataString = `
+155-60-15-74-T
+155-60-20-80-Q
+// ... (incollare tutti i dati dei pneumatici qui) ...
+355-25-22-108-Y
+`;
+
+let tireData = {};
+
+const lines = tireDataString.trim().split('\n');
+lines.forEach(line => {
+    const [larghezza, spalla, diametro, carico, velocita] = line.split('-');
+    if (!tireData[larghezza]) {
+        tireData[larghezza] = {};
+    }
+    if (!tireData[larghezza][spalla]) {
+        tireData[larghezza][spalla] = {};
+    }
+    if (!tireData[larghezza][spalla][diametro]) {
+        tireData[larghezza][spalla][diametro] = {};
+    }
+    if (!tireData[larghezza][spalla][diametro][carico]) {
+        tireData[larghezza][spalla][diametro][carico] = [];
+    }
+    tireData[larghezza][spalla][diametro][carico].push(velocita);
+});
+
+// Database pneumatici moto
+const tireDataMotoString = `
+100-100-18-59-M
+100-100-18-59-R
+// ... (incollare tutti i dati dei pneumatici moto qui) ...
+90-90-21-54-V
+`;
+
+// Stesso processo di caricamento per i dati moto
+let tireDataMoto = {};
+// ...
+
+function updateTireSelects() {
+    // Funzione per popolare un select
+    function populateSelect(select, options) {
+        // Rimuovi tutte le opzioni tranne la prima (placeholder)
+        while (select.options.length > 1) {
+            select.remove(1);
+        }
+        options.forEach(option => {
+            const opt = document.createElement('option');
+            opt.value = option;
+            opt.text = option;
+            select.add(opt);
+        });
+    }
+
+    function setupAutoEvents() {
+        // Selettori per pneumatici auto
+        const larghezzaSelect = document.querySelector('#larghezza-pneumatico');
+        const spallaSelect = document.querySelector('#sezione-pneumatico');
+        const diametroSelect = document.querySelector('#diametro-pneumatico');
+        const caricoSelect = document.querySelector('#carico-pneumatico');
+        const velocitaSelect = document.querySelector('#velocita-pneumatico');
+
+        if (!larghezzaSelect || !spallaSelect || !diametroSelect || !caricoSelect || !velocitaSelect) {
+            return; // Esci se gli elementi non sono disponibili
+        }
+
+        // Eventi change per le auto
+        larghezzaSelect.addEventListener('change', function() {
+            const selectedLarghezza = this.value;
+            spallaSelect.value = '';
+            diametroSelect.value = '';
+            caricoSelect.value = '';
+            velocitaSelect.value = '';
+
+            if (selectedLarghezza && tireData[selectedLarghezza]) {
+                const spalle = Object.keys(tireData[selectedLarghezza]);
+                populateSelect(spallaSelect, spalle);
+            } else {
+                populateSelect(spallaSelect, []);
+            }
+            populateSelect(diametroSelect, []);
+            populateSelect(caricoSelect, []);
+            populateSelect(velocitaSelect, []);
+        });
+
+        // Altri eventi change per pneumatici auto...
+    }
+
+    // Funzioni simili setupMotoAntEvents() e setupMotoPostEvents()...
+
+    // Configura gli eventi quando il DOM è caricato
+    setupAutoEvents();
+    // setupMotoAntEvents();
+    // setupMotoPostEvents();
+}
+
+// Inizializza gli eventi quando il DOM è pronto
+document.addEventListener('DOMContentLoaded', function() {
+    updateTireSelects();
+    
+    // Gestione dei tab preventivo
+    const preventivoSelector = document.querySelector('.preventivo-selector');
+    if (preventivoSelector) {
+        const preventivoPneumatici = document.querySelector('.preventivo_pneumatici');
+        const preventivoMeccanica = document.querySelector('.preventivo_meccanica');
+        const preventivoPneumaticiMoto = document.querySelector('.preventivo_pneumatici_moto');
+
+        function togglePreventivoGroups() {
+            const selectedValue = preventivoSelector.value;
+
+            preventivoPneumatici.classList.add('hidden');
+            preventivoMeccanica.classList.add('hidden');
+            preventivoPneumaticiMoto.classList.add('hidden');
+
+            if (selectedValue === 'PREVENTIVO PNEUMATICI') {
+                preventivoPneumatici.classList.remove('hidden');
+                // Reinizializza gli eventi dopo che il gruppo diventa visibile
+                setTimeout(updateTireSelects, 50);
+            } else if (selectedValue === 'PREVENTIVO MECCANICA') {
+                preventivoMeccanica.classList.remove('hidden');
+            } else if (selectedValue === 'PREVENTIVO PNEUMATICI MOTO') {
+                preventivoPneumaticiMoto.classList.remove('hidden');
+                // Reinizializza gli eventi dopo che il gruppo diventa visibile
+                setTimeout(updateTireSelects, 50);
+            }
+        }
+
+        // Esegui la funzione all'avvio per gestire lo stato iniziale
+        togglePreventivoGroups();
+        preventivoSelector.addEventListener('change', togglePreventivoGroups);
+    }
+});
+
+// MutationObserver per gestire cambiamenti dinamici del DOM
+const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+        if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+            setTimeout(updateTireSelects, 100);
+        }
+    });
+});
+
+// Inizia a osservare i cambiamenti nel DOM
+window.addEventListener('load', function() {
+    observer.observe(document.body, { childList: true, subtree: true });
+    setTimeout(updateTireSelects, 100);
+});
+    </pre>
+
+    <h2>Personalizzazione dei CSS (inserire in Avada Form Options > Custom CSS/JS > CSS)</h2>
+    <pre style="background-color: #f5f5f5; padding: 15px; overflow: auto;">
+/* Stili CSS personalizzati per il form */
+.form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.form-group{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.main-label{
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+.tire-size-container {
+    margin-bottom: 10px;
+}
+.tire-size-selectors{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.tire-select-group {
+    flex-grow: 1;
+    flex-basis: calc(20% - 10px);
+    min-width: calc(20% - 10px);
+}
+.preventivo-group.hidden{
+    display:none;
+}
+.tire-select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Media Query per schermi piccoli */
+@media (max-width: 768px) {
+   .tire-size-selectors {
+        flex-direction: column;
+    }
+    .tire-select-group {
+       width: 100%;
+       min-width: auto;
+       margin-bottom: 10px;
+    }
+}
+    </pre>
+
+    <h2>Note finali per l'implementazione:</h2>
+    <ul>
+        <li>In Avada Form Options > Submission, selezionare "AJAX" e configurare le azioni appropriate (Save To Database, Email, etc)</li>
+        <li>In Avada Form Options > Notifications, configurare correttamente le notifiche email</li>
+        <li>Nei container con ID e classi speciali, utilizzare gli "Advanced" settings di Avada per impostare gli stessi ID e classi usati nel JS</li>
+        <li>Per il container di pneumatici che contiene i selettori dinamici, utilizzare un elemento HTML personalizzato come mostrato invece di elementi standard di form</li>
+        <li>Testare il form dopo l'implementazione per assicurarsi che il JavaScript funzioni correttamente</li>
+    </ul>
+</body>
+</html> 

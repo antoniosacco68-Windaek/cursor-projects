@@ -1,0 +1,68 @@
+Set cn = New ADODB.Connection
+cn.Open "Provider=SQLOLEDB.1;Password=Superboos42s7@#[];Persist Security Info=True;User ID=ant;Initial Catalog=I24DB;Data Source=192.168.100.70;Use Procedure for Prepare=1;Auto Translate=True;Packet Size=4096;Workstation ID=IMPRESA24;Use Encryption for Data=False;Tag with column collation when possible=False"
+
+On Error GoTo GestError
+
+Set cmd = New ADODB.Command
+Set cmd.ActiveConnection = cn
+cmd.CommandType = adCmdStoredProc
+cmd.CommandText = "SP_InvioEmailPerDbLavoroPowershell" ' Nome della Storage procedure da lanciare
+cmd.Parameters.Append _
+    cmd.CreateParameter("@Mittente", adVarChar, adParamInput, 80, Mittente)
+cmd.Parameters.Append _
+    cmd.CreateParameter("@StrTo", adVarChar, adParamInput, 200, strTo)
+cmd.Parameters.Append _
+    cmd.CreateParameter("@Subject", adVarChar, adParamInput, 200, OggettoEmail + Replace(Replace(strAttachment2, "C:\InvioEmailDb\", " "), ".pdf", ""))
+cmd.Parameters.Append _
+    cmd.CreateParameter("@Body", adVarChar, adParamInput, 4000, TTextBody) 'TTextBody
+cmd.Parameters.Append _
+    cmd.CreateParameter("@Attachment", adVarChar, adParamInput, 400, strAttachment2) 'strAttachment2
+
+' Esegue la stored procedure e ottiene il recordset con i risultati
+Dim rs As ADODB.Recordset
+Set rs = cmd.Execute
+
+' Verifica se l'email è stata inviata con successo controllando il campo "Successo"
+Dim emailInviata As Boolean
+Dim messaggioStato As String
+
+If Not rs.EOF Then
+    emailInviata = CBool(rs.Fields("Successo").Value)
+    messaggioStato = rs.Fields("Messaggio").Value
+Else
+    emailInviata = False
+    messaggioStato = "Nessuna risposta dalla procedura di invio email."
+End If
+
+' Chiude connessione e pulisce oggetti
+Set rs = Nothing
+Set cmd = Nothing
+cn.Close
+Set cn = Nothing
+
+' Visualizza messaggio appropriato in base allo stato di invio
+If emailInviata Then
+    If ReportDaStampare <> "PreventivoSoloAntPromoEmailAutomatico" Then
+        MsgBox "Email inviata con successo!" & vbCrLf & messaggioStato, vbInformation
+        DoCmd.Close acForm, "InvioEmail" ' Chiude la Finestra di Invio Email con le Scelte delle Email
+    End If
+    
+    If CurrentProject.AllForms("PreventivoTesta").IsLoaded = True Then Forms!preventivotesta.PR_DataInvioEmail = Now()
+Else
+    MsgBox "Errore nell'invio dell'email." & vbCrLf & messaggioStato, vbExclamation
+End If
+
+Exit Sub
+
+GestError:
+If Err.Number <> 0 Then
+    MsgBox "Errore in Invio. " & Err.Description, vbCritical
+End If
+
+' Assicura che le risorse vengano liberate anche in caso di errore
+If Not rs Is Nothing Then Set rs = Nothing
+If Not cmd Is Nothing Then Set cmd = Nothing
+If Not cn Is Nothing Then
+    If cn.State = adStateOpen Then cn.Close
+    Set cn = Nothing
+End If 

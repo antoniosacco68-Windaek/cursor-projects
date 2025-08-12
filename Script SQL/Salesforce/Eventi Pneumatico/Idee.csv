@@ -1,0 +1,58 @@
+Qury sul veicolo da testare:
+
+USE I24DB
+
+SELECT ascl.Id_Articoli, sl.IdSchedaLavoro, sl.Km, sl.Data_Lavori, ascl.Art_Qta, 
+                      ascl.Art_Descrizione,
+                       dbo.Veicolo.IdVeicolo, 
+					  d.Quantita, d.Misura, d.Modello,d.D_TipoDepositoR1,				  
+					   ISNULL(sl.S_GommeNuoveCliente,'0') AS GommeNuoveCliente, ascl.Art_Codice, d.IdDeposito, d.Note, d.D_ArtCodice
+FROM         dbo.Veicolo (NOLOCK) INNER JOIN
+                      dbo.SchedaLavoro sl (NOLOCK) ON dbo.Veicolo.IdVeicolo = sl.S_IdVeicolo LEFT JOIN
+                      dbo.Deposito d (NOLOCK) ON d.D_IdSchedaLavoro = sl.IdSchedaLavoro AND 
+                      sl.S_IdVeicolo = d.D_IdVeicolo LEFT JOIN
+                      dbo.ArtSchedaLavoro ascl (NOLOCK) ON sl.IdSchedaLavoro = ascl.Art_IdSchedaLavoro
+WHERE ascl.Art_Qta > 0 AND (ascl.Art_Fascia IN ('A', 'B', 'C', 'U') OR ascl.Art_Codice LIKE '%MS_STAG%' OR ascl.Art_Codice LIKE '%MSNUOVO%')
+
+AND IdVeicolo = 89573
+
+ORDER BY sl.Data_Lavori
+
+Risultati:
+
+Id_Articoli	IdSchedaLavoro	Km	Data_Lavori	Art_Qta	Art_Descrizione	IdVeicolo	Quantita	Misura	Modello	D_TipoDepositoR1	GommeNuoveCliente	Art_Codice	IdDeposito	Note	D_ArtCodice
+147917	265001	23800	2019-10-29 12:23:54.000	4.00	215/50R18 92V CONTINENTAL WINTERCONTACT TS 850 P SUV	89573	4	2155018	XL TURANZA T001  BRIDGESTONE AO	Deposito	0	2155018-CON-0354796 	107608	-292278	2155018-BRI-8559
+370689	292278	35000	2020-06-29 14:13:48.000	4.00	Ms Estive/Winter (Da Deposito)	89573	4	2155018	WINTERCONTACT TS 850 P SUV  CONTINENTAL	Deposito	0	@MS_STAG_DEP	121165	-301185	2155018-CON-0354796
+370932	301185	39245	2020-10-01 16:18:26.000	4.00	Ms Estive/Winter (Da Deposito)	89573	4	2155018	XL TURANZA T001  BRIDGESTONE AO	DEPOSITO	0	@MS_STAG_DEP	121682	-328648-	2155018-BRI-8559
+237697	322424	41181	2021-03-25 10:51:36.000	4.00	Ms Estive/Winter (Porta Cliente) Cerchio Lega	89573	4	2155018	WinterContact TS 850 P  CONTINENTAL	DEPOSITO	0	@MS_STAG_CLI	133964	-364561	2155018-CON-0354796
+674214	350842	48300	2021-10-16 08:02:23.000	4.00	Ms Estive/Winter (Deposito) Cerchio Lega (SUV)	89573	4	2155018	TURANZA T001  BRIDGESTONE AO	DEPOSITO	0	@MS_STAG_DEP	148287	-371557	2155018-BRI-8559
+745537	371557	56400	2022-04-07 12:36:47.000	4.00	Montaggio stagionale cerchio 18"/19" (DEP)	89573	4	2155018	WinterContact TS 850 P  CONTINENTAL	DEPOSITO	0	@MS_STAG_DEP	252992	NULL	2155018-CON-0354796
+825775	396662	61772	2022-10-20 07:54:35.000	4.00	Montaggio stagionale cerchio 18"/19" (DEP)	89573	4	2155018	TURANZA T001  BRIDGESTONE AO	SMALTITE	0	@MS_STAG_DEP	171687	NULL	2155018-BRI-8559
+932166	430276	72839	2023-05-31 10:37:26.000	4.00	215/50R18 92W BRIDGESTONE TURANZA 6 (B-A-69)	89573	4	2155018	WinterContact TS 850 P  CONTINENTAL	DEPOSITO	0	2155018-BRI-26012	191001	(1 Invio SMS Deposito 27-09-23)-442838 (Invio Email Deposito 2025-05-08)	2155018-CON-0354796
+969261	442838	74696	2023-10-03 11:17:28.000	4.00	MONTAGGIO STAGIONALE CERCHIO 18"/19" (DEP)	89573	4	2155018	TURANZA 6  BRIDGESTONE	DEPOSITO	0	@MS_STAG_DEP	193921	-469438	2155018-BRI-26012
+1037360	469438	82187	2024-03-20 09:55:39.000	4.00	MONTAGGIO STAGIONALE CERCHIO 18"/19" (DEP)	89573	4	2155018	WinterContact TS 850 P  CONTINENTAL	DEPOSITO	0	@MS_STAG_DEP	209752	-500419	2155018-CON-0354796
+1114937	500419	89000	2024-10-15 08:27:41.000	4.00	MONTAGGIO STAGIONALE CERCHIO 18"/19" (DEP)	89573	4	2155018	TURANZA 6  BRIDGESTONE	DEPOSITO	0	@MS_STAG_DEP	225988	-523297	2155018-BRI-26012
+1180664	523297	93595	2025-03-19 09:01:58.000	4.00	MONTAGGIO STAGIONALE CERCHIO 18"/19" (DEP)	89573	4	2155018	WinterContact TS 850 P  CONTINENTAL	DEPOSITO FINITE	0	@MS_STAG_DEP	239580	NULL	2155018-CON-0354796
+
+
+Tue Anagrafe dei Pneuamtici univoche estratta dalla query precedente:
+
+IdVeicolo	CodiceArticolo	IdArticolo	DOT__c	External_Id__c	TipoPneumatico	RankPneumatico
+89573	2155018-CON-0354796 	551077	3119	89573_551077_3119	NEWLY_MOUNTED	1
+89573	2155018-BRI-26012	597088	1023	89573_597088_1023	NEWLY_MOUNTED	1
+89573	2155018-BRI-8559	560226	3119	89573_560226_3119	SOLO_DEPOSITO	1
+
+
+Nella mia testa a questo punto noi abbiamo nella tua Anagrafica dei Pneumatici univoci i codici articolo e come vedi dalla ia query noi abbiamo il codice articolo come in riga 24 "Art_Codice" = 2155018-CON-0354796 che è in scheda Lavoro che corrisponde al tuo quindi essendo in scheda lavoro e "Montato"
+poi abbiamo nella stessa riga in D_ArtCodice = 2155018-BRI-8559 il codice articolo che mettiamo in Deposito che corrisponde ai tuoi articoli del veicolo e quinid diventa "smontato" con tanto di Dati in entrambi i casi di Data LAvoro KM e vari IdSchedaLavoro e idarticolischedalavoro.
+Riga 25 è un rimontaggio da deposito stagionale quindi è smontato e messo in deposito l'alticolo 2155018-CON-0354796 e in scheda lavoro come Art_Codice = @MS_STAG_DEP e un semplice rimontaggio dell'articolo che avevamo in deposito quindi il 2155018-BRI-8559 e così sempre avanti fino alla 
+riga 30 dove abbiamo il cambio stagionale di nuovo con le 2155018-BRI-8559 segnate smaltite e quindi finiscono la loro storia, e rimontiamo le gomme che avevamo in deposito quindi le 2155018-CON-0354796.
+Riga 31 ovviamente abbiamo le gomme nuove con il codice articolo in scheda lavoro 2155018-BRI-26012 e mettiamo in deposito le 2155018-CON-0354796
+e prosegue così fino alla fine molto logica e semplice.
+
+E anche nel caso in cui senza cambio stagionale se montassimo 4 gomme nuove al posto di altre 4 della stessa stagione solo per usura non avremmo un deposito perché se le segnamo nella scheda deposito legata alla scheda lavoro sarebbero segnate come samltite quindi non avremmo interferenze ma solo
+un'altra gomma nuova da tracciare...
+
+A me sembra molto semplice e lineare e anche se le gomme sono originali o montate da un'altra officina noi nel momento che le vediamo transitare nel deposito le tracciamo e calcoliamo i loro passaggi e km.
+
+Quindi direi che così nel 90% dei sicuramente funziona e quel 10% in cui non funziona e lo stesso visto che è meglio che fuznioni con il 90 e spbagli il 10 che non aver nulla poi nel nuovo sistema in cui porto i dati traccerò in maniera molto precisa i pneumatici in modo da non aver più problemi.

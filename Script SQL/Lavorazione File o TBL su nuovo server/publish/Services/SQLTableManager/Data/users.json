@@ -1,0 +1,27 @@
+[
+  {
+    "Username": "",
+    "PasswordHash": "",
+    "Role": "",
+    "Permissions": [],
+    "CreatedAt": "0001-01-01T00:00:00",
+    "LastLogin": null,
+    "IsActive": true
+  },
+  {
+    "Username": "admin",
+    "PasswordHash": "$2a$11$f4o528C3LZqb.klI5Rr3oudstiRa9itJmeCyG9Ziue/x6TyoU5Ui.",
+    "Role": "Admin",
+    "Permissions": [
+      "read",
+      "write",
+      "delete",
+      "export",
+      "manage_users",
+      "execute_procedures"
+    ],
+    "CreatedAt": "2025-07-10T07:02:54.8429146Z",
+    "LastLogin": "2025-07-29T06:01:39.1956094Z",
+    "IsActive": true
+  }
+]

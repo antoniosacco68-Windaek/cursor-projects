@@ -1,0 +1,7 @@
+{
+  "JsonSerializerOptions": {
+    "PropertyNamingPolicy": null,
+    "WriteIndented": true,
+    "PropertyNameCaseInsensitive": false
+  }
+} 

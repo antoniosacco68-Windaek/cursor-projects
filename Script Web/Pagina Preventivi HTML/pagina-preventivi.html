@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Richiesta Preventivo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #e32626;
+            --secondary-color: #333;
+            --light-gray: #f5f5f5;
+            --dark-gray: #666;
+            --white: #fff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+        
+        body {
+            background-color: var(--white);
+            color: var(--secondary-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        header {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .top-nav {
+            background-color: var(--primary-color);
+            padding: 10px 0;
+        }
+        
+        .top-nav ul {
+            display: flex;
+            justify-content: flex-end;
+            list-style: none;
+        }
+        
+        .top-nav li {
+            margin-left: 30px;
+        }
+        
+        .top-nav a {
+            color: var(--white);
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .logo {
+            padding: 15px 0;
+        }
+        
+        .logo img {
+            height: 60px;
+        }
+        
+        .main-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 25px;
+        }
+        
+        .nav-links a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+        
+        .search-box {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .search-box input {
+            border: none;
+            outline: none;
+            margin-right: 10px;
+        }
+        
+        .hero {
+            padding: 60px 0;
+            background-color: var(--light-gray);
+            text-align: center;
+            background-image: url('https://bolognagomme.eu/wp-content/uploads/2019/05/bg_gomme_centro_bg1_bargellino.jpg');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+        
+        .hero .container {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero h1 {
+            color: var(--white);
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+        
+        .hero h2 {
+            font-size: 2rem;
+            color: var(--white);
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+        
+        .hero p {
+            color: var(--white);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .placeholder-form {
+            background-color: var(--white);
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+            margin-top: 40px;
+            margin-bottom: 50px;
+            text-align: center;
+        }
+        
+        .placeholder-form h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .form-placeholder-icon {
+            font-size: 5rem;
+            color: var(--light-gray);
+            margin: 20px 0;
+        }
+        
+        .locations {
+            padding: 70px 0;
+            background-color: var(--white);
+        }
+        
+        .locations h2 {
+            text-align: center;
+            font-size: 2.2rem;
+            margin-bottom: 60px;
+            color: var(--secondary-color);
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+        
+        .locations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        
+        .location-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .location-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .location-image {
+            height: 180px;
+            background-color: var(--light-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .location-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .location-info {
+            padding: 24px;
+            text-align: center;
+        }
+        
+        .location-info h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+        
+        .location-info p {
+            color: var(--dark-gray);
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+        
+        .call-btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 10px 25px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 15px;
+            transition: background-color 0.3s;
+            letter-spacing: 1px;
+        }
+        
+        .call-btn:hover {
+            background-color: #c41c1c;
+        }
+        
+        .map-section {
+            padding: 60px 0;
+            background-color: var(--light-gray);
+            text-align: center;
+        }
+        
+        .map-section h3 {
+            text-align: center;
+            font-size: 1.6rem;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+        
+        .text-center {
+            text-align: center;
+            margin-bottom: 30px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.7;
+        }
+        
+        .map-container {
+            height: 450px;
+            background-color: #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            margin-top: 30px;
+        }
+        
+        footer {
+            background-color: var(--secondary-color);
+            color: var(--white);
+            padding: 60px 0 30px;
+        }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-col h4 {
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            color: var(--white);
+            font-weight: 700;
+            position: relative;
+        }
+        
+        .footer-col h4::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -8px;
+            width: 50px;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+        
+        .footer-col ul {
+            list-style: none;
+        }
+        
+        .footer-col li {
+            margin-bottom: 12px;
+        }
+        
+        .footer-col a {
+            color: #bbb;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-size: 0.95rem;
+        }
+        
+        .footer-col a:hover {
+            color: var(--white);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .social-links a {
+            color: var(--white);
+            font-size: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: #444;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+        }
+        
+        .social-links a:hover {
+            background-color: var(--primary-color);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 25px;
+            border-top: 1px solid #444;
+            font-size: 14px;
+            color: #bbb;
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--secondary-color);
+        }
+        
+        .section-title-container {
+            text-align: center;
+            margin-bottom: 70px;
+        }
+        
+        .section-title {
+            position: relative;
+            display: inline-block;
+            padding: 0 20px;
+            background: var(--white);
+            z-index: 1;
+        }
+        
+        .section-title-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: #e0e0e0;
+            z-index: -1;
+        }
+        
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .hero h2 {
+                font-size: 1.6rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: var(--white);
+                flex-direction: column;
+                padding: 20px;
+                box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+            }
+            
+            .nav-links.active {
+                display: flex;
+            }
+            
+            .nav-links li {
+                margin: 12px 0;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .locations-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+            
+            .hero h2 {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="top-nav">
+            <div class="container">
+                <ul>
+                    <li><a href="#">PREVENTIVI</a></li>
+                    <li><a href="#">PROMOZIONI</a></li>
+                    <li><a href="#">I NOSTRI CENTRI</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="container">
+            <div class="main-nav">
+                <div class="logo">
+                    <img src="https://bolognagomme.eu/wp-content/uploads/2019/05/bologna_gomme_logo_header.png" alt="Bologna Gomme Logo">
+                </div>
+                <button class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="search-box">
+                    <input type="text" placeholder="Cerca...">
+                    <i class="fas fa-search"></i>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Chi Siamo</a></li>
+                    <li><a href="#">Pneumatici</a></li>
+                    <li><a href="#">Meccanica</a></li>
+                    <li><a href="#">Servizi</a></li>
+                    <li><a href="#">Convenzioni</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Richiesta Preventivo</h1>
+            <h2>Compila il form per ricevere il tuo preventivo su gomme o meccanica</h2>
+            <p>Per richieste riguardanti gli <strong>pneumatici</strong> è necessario inserire la misura corretta del tuo veicolo.</p>
+            <p>Per i preventivi di <strong>meccanica</strong> è necessario inserire la targa e i km attuali del veicolo.</p>
+            
+            <div class="placeholder-form">
+                <h3>Form di richiesta preventivo</h3>
+                <div class="form-placeholder-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <p>Il form per la richiesta del preventivo sarà inserito qui</p>
+                <!-- Spazio riservato per il modulo che verrà aggiunto separatamente -->
+            </div>
+        </div>
+    </section>
+
+    <section class="locations">
+        <div class="container">
+            <div class="section-title-container">
+                <div class="section-title-line"></div>
+                <h2 class="section-title">7 centri su Bologna, un'unica azienda</h2>
+            </div>
+            <div class="locations-grid">
+                <div class="location-card">
+                    <div class="location-image">
+                        <img src="https://bolognagomme.eu/wp-content/uploads/2019/05/bg_gomme_centro_bg1_bargellino.jpg" alt="BG1 Bargellino">
+                    </div>
+                    <div class="location-info">
+                        <h3>BG1</h3>
+                        <p>BARGELLINO (BO)</p>
+                        <p>Via Persicetana Vecchia, 20</p>
+                        <p>Tel: +39 051 406215</p>
+                        <p>bg1team@bolognagomme.com</p>
+                        <a href="tel:+39051406215" class="call-btn">CHIAMA</a>
+                    </div>
+                </div>
+                
+                <div class="location-card">
+                    <div class="location-image">
+                        <img src="https://bolognagomme.eu/wp-content/uploads/2019/05/bg_gomme_centro_bg2_borgo_panigale.jpg" alt="BG2 Borgo Panigale">
+                    </div>
+                    <div class="location-info">
+                        <h3>BG2</h3>
+                        <p>BORGO PANIGALE (BO)</p>
+                        <p>Via Marco Emilio Lepido, 225</p>
+                        <p>Tel: +39 051 404517</p>
+                        <p>bg2team@bolognagomme.com</p>
+                        <a href="tel:+39051404517" class="call-btn">CHIAMA</a>
+                    </div>
+                </div>
+                
+                <div class="location-card">
+                    <div class="location-image">
+                        <img src="https://bolognagomme.eu/wp-content/uploads/2019/05/bg_gomme_centro_bg3_villanova.jpg" alt="BG3 Villanova">
+                    </div>
+                    <div class="location-info">
+                        <h3>BG3</h3>
+                        <p>VILLANOVA (CASTENASO)</p>
+                        <p>Via Tosarelli, 296/2</p>
+                        <p>Tel: +39 051 781203</p>
+                        <p>bg3team@bolognagomme.com</p>
+                        <a href="tel:+39051781203" class="call-btn">CHIAMA</a>
+                    </div>
+                </div>
+                
+                <div class="location-card">
+                    <div class="location-image">
+                        <img src="https://bolognagomme.eu/wp-content/uploads/2019/05/bg_gomme_centro_bg4_ozzano.jpg" alt="BG4 Ozzano Emilia">
+                    </div>
+                    <div class="location-info">
+                        <h3>BG4</h3>
+                        <p>PONTE RIZZOLI (OZZANO)</p>
+                        <p>Via Progresso, 36/B</p>
+                        <p>Tel: +39 051 6511310</p>
+                        <p>bg4team@bolognagomme.com</p>
+                        <a href="tel:+390516511310" class="call-btn">CHIAMA</a>
+                    </div>
+                </div>
+                
+                <div class="location-card">
+                    <div class="location-image">
+                        <img src="https://bolognagomme.eu/wp-content/uploads/2019/05/bg_gomme_centro_bg5_castel_guelfo.jpg" alt="BG5 Castel Guelfo">
+                    </div>
+                    <div class="location-info">
+                        <h3>BG5</h3>
+                        <p>CASTEL GUELFO (BOLOGNA)</p>
+                        <p>Via del Commercio, 7</p>
+                        <p>Tel: +39 0542 670284</p>
+                        <p>bg5team@bolognagomme.com</p>
+                        <a href="tel:+390542670284" class="call-btn">CHIAMA</a>
+                    </div>
+                </div>
+                
+                <div class="location-card">
+                    <div class="location-image">
+                        <img src="https://bolognagomme.eu/wp-content/uploads/2019/05/bg_gomme_centro_bg6_castel_san_pietro.jpg" alt="BG6 Castel San Pietro">
+                    </div>
+                    <div class="location-info">
+                        <h3>BG6</h3>
+                        <p>CASTEL SAN PIETRO (BOLOGNA)</p>
+                        <p>Via T.A Edison, 23</p>
+                        <p>Tel: +39 051 943751</p>
+                        <p>bg6team@bolognagomme.com</p>
+                        <a href="tel:+39051943751" class="call-btn">CHIAMA</a>
+                    </div>
+                </div>
+                
+                <div class="location-card">
+                    <div class="location-image">
+                        <img src="https://bolognagomme.eu/wp-content/uploads/2019/05/bg_gomme_centro_bg7_funo.jpg" alt="BG7 Funo di Argelato">
+                    </div>
+                    <div class="location-info">
+                        <h3>BG7</h3>
+                        <p>FUNO DI ARGELATO (BOLOGNA)</p>
+                        <p>Via Galliera, 10/12</p>
+                        <p>Tel: +39 051 6646840</p>
+                        <p>bg7team@bolognagomme.com</p>
+                        <a href="tel:+390516646840" class="call-btn">CHIAMA</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="map-section">
+        <div class="container">
+            <h3>Seleziona un punto vendita sulla mappa</h3>
+            <p class="text-center">Clicca sull'<strong>indirizzo</strong> per visualizzare le indicazioni su <strong>Google Maps</strong>, sul numero di <strong>telefono</strong> per effettuare una <strong>chiamata</strong> o sull'indirizzo <strong>email</strong> per inviare un <strong>messaggio</strong>.</p>
+            <div class="map-container">
+                <iframe src="https://www.google.com/maps/d/embed?mid=1SgXEbJbPi1P9qQaSGu-8sTZpvYL9kO4&ehbc=2E312F&noprof=1" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>Menu</h4>
+                    <ul>
+                        <li><a href="#">Chi siamo</a></li>
+                        <li><a href="#">Pneumatici</a></li>
+                        <li><a href="#">Meccanica</a></li>
+                        <li><a href="#">Servizi</a></li>
+                        <li><a href="#">Convenzioni</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Promozioni</a></li>
+                        <li><a href="#">Contatti</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Collaborazioni</h4>
+                    <ul>
+                        <li><a href="#">Flotte Leasing</a></li>
+                        <li><a href="#">Gruppo Hera</a></li>
+                        <li><a href="#">Conti 360°</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Seguici sui social</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Newsletter</h4>
+                    <p>RIMANI AGGIORNATO CON IL NOSTRO BLOG</p>
+                    <!-- Form newsletter -->
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>© Copyright 2023 | Tutti i diritti riservati | Privacy | Cookies</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Gestione menu mobile
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const navLinks = document.querySelector('.nav-links');
+        
+        mobileMenuBtn.addEventListener('click', function() {
+            navLinks.classList.toggle('active');
+        });
+        
+        // Chiudi menu mobile quando si clicca fuori
+        document.addEventListener('click', function(event) {
+            if (!navLinks.contains(event.target) && !mobileMenuBtn.contains(event.target)) {
+                navLinks.classList.remove('active');
+            }
+        });
+        
+        // Smooth scroll per i link di ancoraggio
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    });
+    </script>
+</body>
+</html> 

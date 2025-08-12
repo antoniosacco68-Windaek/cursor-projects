@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Regole Distribuzione - CSV Edition</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #2c3e50, #34495e);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .file-section {
+            background: #e3f2fd;
+            padding: 20px;
+            border-bottom: 1px solid #dee2e6;
+            text-align: center;
+        }
+
+        .file-info {
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 10px;
+        }
+
+        .file-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .file-status.loaded {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .file-status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .file-status.empty {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .toolbar {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .filters {
+            background: #e9ecef;
+            padding: 15px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9rem;
+        }
+
+        .filter-input {
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            max-height: 60vh;
+            position: relative;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .data-table th {
+            background: #343a40;
+            color: white;
+            padding: 12px 8px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-right: 1px solid #495057;
+        }
+
+        .data-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #dee2e6;
+            border-right: 1px solid #dee2e6;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .data-table tbody tr.selected {
+            background-color: #d1ecf1;
+        }
+
+        .data-table tbody tr.modified {
+            background-color: #fff3cd;
+        }
+
+        .editable-cell {
+            background: none;
+            border: none;
+            width: 100%;
+            padding: 5px;
+            font-size: 0.9rem;
+        }
+
+        .editable-cell:focus {
+            background: #fff3cd;
+            outline: 2px solid #ffc107;
+            border-radius: 4px;
+        }
+
+        .listino-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .listino-piattaforme {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .listino-b2b {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .listino-collegati {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-bar {
+            background: #f8f9fa;
+            padding: 15px;
+            border-top: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: #28a745;
+        }
+
+        .notification.error {
+            background: #dc3545;
+        }
+
+        .notification.warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .hidden-input {
+            display: none;
+        }
+
+        .csv-preview {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 0.8rem;
+            white-space: pre;
+            overflow-x: auto;
+            max-height: 200px;
+        }
+
+        .changes-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #ffc107;
+            color: #212529;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .changes-indicator.show {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .toolbar, .filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .data-table {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-file-csv"></i> Gestione Regole Distribuzione - CSV</h1>
+            <p>Gestione diretta del file RegoleListiniDistribuzione.csv</p>
+        </div>
+
+        <div class="file-section">
+            <div class="file-info">
+                <i class="fas fa-file-csv fa-2x" style="color: #28a745;"></i>
+                <div>
+                    <div><strong>File CSV:</strong> RegoleListiniDistribuzione.csv</div>
+                    <div id="fileStatus" class="file-status empty">Nessun file caricato</div>
+                </div>
+            </div>
+            <div style="margin-top: 15px;">
+                <button class="btn btn-primary" onclick="loadCSVFile()">
+                    <i class="fas fa-folder-open"></i> Carica CSV dal tuo computer
+                </button>
+                <button class="btn btn-success" onclick="loadPredefinedPath()" style="margin-left: 10px;">
+                    <i class="fas fa-download"></i> Carica da: C:\Antonio\RegoleB2bPerSoldi\...
+                </button>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <button class="btn btn-success" onclick="addNewRule()" disabled id="btnAdd">
+                <i class="fas fa-plus"></i> Nuova Regola
+            </button>
+            <button class="btn btn-primary" onclick="saveCSVFile()" disabled id="btnSave">
+                <i class="fas fa-save"></i> Salva CSV
+            </button>
+            <button class="btn btn-warning" onclick="exportToSQL()" disabled id="btnExport">
+                <i class="fas fa-database"></i> Esporta SQL
+            </button>
+            <button class="btn btn-danger" onclick="deleteSelected()" disabled id="btnDelete">
+                <i class="fas fa-trash"></i> Elimina Selezionate
+            </button>
+            <div style="margin-left: auto;">
+                <span id="unsavedCount" style="color: #dc3545; font-weight: 600;"></span>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label>Listino:</label>
+                <select id="filterListino" class="filter-input" onchange="applyFilters()">
+                    <option value="">Tutti</option>
+                    <option value="Piattaforme">Piattaforme</option>
+                    <option value="B2B">B2B</option>
+                    <option value="Collegati">Collegati</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Settore:</label>
+                <select id="filterSettore" class="filter-input" onchange="applyFilters()">
+                    <option value="">Tutti</option>
+                    <option value="Vettura">Vettura</option>
+                    <option value="Autocarro">Autocarro</option>
+                    <option value="MotoScooter">MotoScooter</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Prezzo Da:</label>
+                <input type="number" id="filterPrezzoMin" class="filter-input" onchange="applyFilters()" placeholder="€">
+            </div>
+            <div class="filter-group">
+                <label>Prezzo A:</label>
+                <input type="number" id="filterPrezzoMax" class="filter-input" onchange="applyFilters()" placeholder="€">
+            </div>
+            <div class="filter-group">
+                <label>Cerca:</label>
+                <input type="text" id="filterSearch" class="filter-input" onchange="applyFilters()" placeholder="Cerca...">
+            </div>
+            <button class="btn btn-primary" onclick="clearFilters()">
+                <i class="fas fa-times"></i> Pulisci Filtri
+            </button>
+        </div>
+
+        <div class="table-container">
+            <table class="data-table" id="dataTable">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                        <th>ID</th>
+                        <th>Listino</th>
+                        <th>Cifra In (€)</th>
+                        <th>Cifra Out (€)</th>
+                        <th>Margine (€)</th>
+                        <th>Marg+</th>
+                        <th>Marg-</th>
+                        <th>Settore</th>
+                        <th>Ricarico %</th>
+                        <th>Provv. Piatt.</th>
+                        <th>Marg- Estivo</th>
+                        <th>Marg- AS</th>
+                        <th>Marg- Invernale</th>
+                        <th>Data Creazione</th>
+                        <th>Data Modifica</th>
+                        <th>Azioni</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td colspan="17" style="text-align: center; padding: 40px; color: #6c757d;">
+                            <i class="fas fa-upload fa-3x" style="margin-bottom: 15px; opacity: 0.5;"></i><br>
+                            Carica un file CSV per iniziare
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="status-bar">
+            <div>
+                <span id="recordCount">Nessun file caricato</span> | 
+                <span id="selectedCount">0 selezionate</span>
+            </div>
+            <div>
+                <span id="fileInfo">--</span> |
+                <span id="lastUpdate">--</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Input file nascosto -->
+    <input type="file" id="csvFileInput" class="hidden-input" accept=".csv" onchange="handleFileLoad(this.files[0])">
+
+    <!-- Indicatore modifiche -->
+    <div id="changesIndicator" class="changes-indicator">
+        <i class="fas fa-exclamation-triangle"></i> Hai modifiche non salvate!
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+        // Variabili globali
+        let csvData = [];
+        let filteredData = [];
+        let selectedRows = new Set();
+        let unsavedChanges = 0;
+        let fileName = '';
+
+        // Carica file CSV
+        function loadCSVFile() {
+            document.getElementById('csvFileInput').click();
+        }
+
+        // Simula caricamento dal percorso predefinito
+        function loadPredefinedPath() {
+            // In un ambiente reale, questo richiederebbe un backend
+            // Per ora, mostriamo un messaggio informativo
+            showNotification('Per caricare direttamente dal percorso C:\\ devi trascinare il file CSV nell\'area di upload o usare il pulsante "Carica CSV"', 'warning');
+            
+            // Carico dati di esempio basati sul CSV fornito
+            loadSampleData();
+        }
+
+        // Carica dati di esempio (basati sul CSV fornito)
+        function loadSampleData() {
+            const sampleCSV = `ID;NomeListino;CifraIn;CifraOut;Margine;MargPiu;MargMeno;Settore;RicaricoPercentuale;ProvvPiatt;MargMenoEstivo;MargMenoAS;MargMenoInvernale;DataCreazione;DataModifica
+1;Piattaforme;0.00;30.00;5.50;0.00;2.00;Vettura;null;1.0130;null;null;null;23/06/2025 13:19:27;23/06/2025 13:19:27
+2;Piattaforme;30.01;40.00;6.50;0.00;2.50;Vettura;null;1.0130;null;null;null;23/06/2025 13:19:27;23/06/2025 13:19:27
+3;Piattaforme;40.01;50.00;8.50;0.00;3.00;Vettura;null;1.0130;null;null;null;23/06/2025 13:19:27;23/06/2025 13:19:27
+4;Piattaforme;50.01;60.00;9.00;0.00;3.00;Vettura;null;1.0130;null;null;null;23/06/2025 13:19:27;23/06/2025 13:19:27
+31;B2B;0.00;30.00;5.50;0.00;0.00;Vettura;null;1.0000;null;null;null;23/06/2025 13:19:27;23/06/2025 13:19:27
+32;B2B;30.01;40.00;6.50;0.00;0.00;Vettura;null;1.0000;null;null;null;23/06/2025 13:19:27;23/06/2025 13:19:27
+61;Collegati;0.00;30.00;5.50;0.00;0.00;Vettura;null;1.0000;null;null;null;23/06/2025 13:19:27;23/06/2025 13:19:27`;
+            
+            parseCSVContent(sampleCSV);
+            fileName = 'RegoleListiniDistribuzione.csv (Dati di esempio)';
+            updateFileStatus('loaded', 'File di esempio caricato');
+            showNotification('Dati di esempio caricati! Puoi modificarli e salvare il file CSV.', 'success');
+        }
+
+        // Gestisce il caricamento del file
+        function handleFileLoad(file) {
+            if (!file) return;
+
+            fileName = file.name;
+            updateFileStatus('loading', 'Caricamento in corso...');
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    parseCSVContent(e.target.result);
+                    updateFileStatus('loaded', `File caricato: ${file.size} bytes`);
+                    showNotification(`File ${fileName} caricato con successo!`, 'success');
+                } catch (error) {
+                    updateFileStatus('error', 'Errore nel caricamento');
+                    showNotification('Errore nel parsing del CSV: ' + error.message, 'error');
+                }
+            };
+            reader.readAsText(file, 'UTF-8');
+        }
+
+        // Parsing del contenuto CSV
+        function parseCSVContent(csvText) {
+            const lines = csvText.trim().split('\n');
+            const headers = lines[0].split(';');
+            
+            csvData = [];
+            for (let i = 1; i < lines.length; i++) {
+                if (lines[i].trim() === '') continue;
+                
+                const values = lines[i].split(';');
+                const row = {};
+                
+                headers.forEach((header, index) => {
+                    let value = values[index] || '';
+                    
+                    // Rimuovi virgolette se presenti
+                    if (value.startsWith('"') && value.endsWith('"')) {
+                        value = value.slice(1, -1);
+                    }
+                    
+                    // Converti null string in null
+                    if (value === 'null' || value === '') {
+                        value = null;
+                    }
+                    // Converti numeri
+                    else if (!isNaN(value) && value.includes('.')) {
+                        value = parseFloat(value);
+                    }
+                    else if (!isNaN(value) && !value.includes('/')) {
+                        value = parseInt(value);
+                    }
+                    
+                    row[header.trim()] = value;
+                });
+                
+                csvData.push(row);
+            }
+            
+            filteredData = [...csvData];
+            renderTable();
+            updateStatusBar();
+            enableButtons();
+            unsavedChanges = 0;
+            updateChangesIndicator();
+        }
+
+        // Aggiorna stato file
+        function updateFileStatus(status, message) {
+            const statusEl = document.getElementById('fileStatus');
+            statusEl.className = `file-status ${status}`;
+            statusEl.textContent = message;
+        }
+
+        // Abilita pulsanti
+        function enableButtons() {
+            document.getElementById('btnAdd').disabled = false;
+            document.getElementById('btnSave').disabled = false;
+            document.getElementById('btnExport').disabled = false;
+            document.getElementById('btnDelete').disabled = false;
+        }
+
+        // Rendering tabella
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            if (filteredData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="17" style="text-align: center; padding: 40px; color: #6c757d;">
+                            <i class="fas fa-search fa-2x" style="margin-bottom: 15px; opacity: 0.5;"></i><br>
+                            Nessun risultato trovato
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            filteredData.forEach(row => {
+                const tr = createTableRow(row);
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Crea riga tabella
+        function createTableRow(row) {
+            const tr = document.createElement('tr');
+            tr.dataset.id = row.ID;
+            
+            if (selectedRows.has(row.ID)) {
+                tr.classList.add('selected');
+            }
+
+            tr.innerHTML = `
+                <td><input type="checkbox" onchange="toggleRowSelection(${row.ID})" ${selectedRows.has(row.ID) ? 'checked' : ''}></td>
+                <td>${row.ID || 'AUTO'}</td>
+                <td><span class="listino-badge listino-${(row.NomeListino || '').toLowerCase()}">${row.NomeListino || ''}</span></td>
+                <td><input type="number" class="editable-cell" value="${row.CifraIn || ''}" onchange="updateField(${row.ID}, 'CifraIn', this.value)" step="0.01"></td>
+                <td><input type="number" class="editable-cell" value="${row.CifraOut || ''}" onchange="updateField(${row.ID}, 'CifraOut', this.value)" step="0.01"></td>
+                <td><input type="number" class="editable-cell" value="${row.Margine || ''}" onchange="updateField(${row.ID}, 'Margine', this.value)" step="0.01"></td>
+                <td><input type="number" class="editable-cell" value="${row.MargPiu || ''}" onchange="updateField(${row.ID}, 'MargPiu', this.value)" step="0.01"></td>
+                <td><input type="number" class="editable-cell" value="${row.MargMeno || ''}" onchange="updateField(${row.ID}, 'MargMeno', this.value)" step="0.01"></td>
+                <td>
+                    <select class="editable-cell" onchange="updateField(${row.ID}, 'Settore', this.value)">
+                        <option value="">-</option>
+                        <option value="Vettura" ${row.Settore === 'Vettura' ? 'selected' : ''}>Vettura</option>
+                        <option value="Autocarro" ${row.Settore === 'Autocarro' ? 'selected' : ''}>Autocarro</option>
+                        <option value="MotoScooter" ${row.Settore === 'MotoScooter' ? 'selected' : ''}>MotoScooter</option>
+                    </select>
+                </td>
+                <td><input type="number" class="editable-cell" value="${row.RicaricoPercentuale || ''}" onchange="updateField(${row.ID}, 'RicaricoPercentuale', this.value)" step="0.001" placeholder="1.25"></td>
+                <td><input type="number" class="editable-cell" value="${row.ProvvPiatt || ''}" onchange="updateField(${row.ID}, 'ProvvPiatt', this.value)" step="0.0001"></td>
+                <td><input type="number" class="editable-cell" value="${row.MargMenoEstivo || ''}" onchange="updateField(${row.ID}, 'MargMenoEstivo', this.value)" step="0.01"></td>
+                <td><input type="number" class="editable-cell" value="${row.MargMenoAS || ''}" onchange="updateField(${row.ID}, 'MargMenoAS', this.value)" step="0.01"></td>
+                <td><input type="number" class="editable-cell" value="${row.MargMenoInvernale || ''}" onchange="updateField(${row.ID}, 'MargMenoInvernale', this.value)" step="0.01"></td>
+                <td>${formatDate(row.DataCreazione)}</td>
+                <td>${formatDate(row.DataModifica)}</td>
+                <td>
+                    <button class="btn btn-danger" onclick="deleteRow(${row.ID})" style="padding: 5px 10px; font-size: 0.8rem;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+
+            return tr;
+        }
+
+        // Aggiorna campo
+        function updateField(id, field, value) {
+            const row = csvData.find(r => r.ID == id);
+            if (row) {
+                // Converti valore
+                let convertedValue = value;
+                if (value === '' || value === 'null') {
+                    convertedValue = null;
+                } else if (!isNaN(value) && field !== 'NomeListino' && field !== 'Settore') {
+                    convertedValue = field.includes('Data') ? value : parseFloat(value);
+                }
+                
+                row[field] = convertedValue;
+                row.DataModifica = new Date().toLocaleString('it-IT');
+                
+                // Marca riga come modificata
+                const rowEl = document.querySelector(`tr[data-id="${id}"]`);
+                if (rowEl) {
+                    rowEl.classList.add('modified');
+                }
+                
+                unsavedChanges++;
+                updateChangesIndicator();
+                showNotification('Campo aggiornato. Ricorda di salvare!', 'warning');
+            }
+        }
+
+        // Aggiungi nuova regola
+        function addNewRule() {
+            const newId = Math.max(...csvData.map(r => r.ID || 0)) + 1;
+            const newRow = {
+                ID: newId,
+                NomeListino: 'B2B',
+                CifraIn: 0.00,
+                CifraOut: 0.00,
+                Margine: 0.00,
+                MargPiu: 0.00,
+                MargMeno: 0.00,
+                Settore: 'Vettura',
+                RicaricoPercentuale: null,
+                ProvvPiatt: 1.0000,
+                MargMenoEstivo: null,
+                MargMenoAS: null,
+                MargMenoInvernale: null,
+                DataCreazione: new Date().toLocaleString('it-IT'),
+                DataModifica: new Date().toLocaleString('it-IT')
+            };
+            
+            csvData.push(newRow);
+            applyFilters();
+            unsavedChanges++;
+            updateChangesIndicator();
+            showNotification('Nuova regola aggiunta!', 'success');
+        }
+
+        // Elimina riga
+        function deleteRow(id) {
+            if (confirm('Sei sicuro di voler eliminare questa regola?')) {
+                csvData = csvData.filter(r => r.ID != id);
+                selectedRows.delete(id);
+                applyFilters();
+                unsavedChanges++;
+                updateChangesIndicator();
+                showNotification('Regola eliminata!', 'success');
+            }
+        }
+
+        // Elimina selezionate
+        function deleteSelected() {
+            if (selectedRows.size === 0) {
+                showNotification('Nessuna regola selezionata', 'error');
+                return;
+            }
+
+            if (confirm(`Sei sicuro di voler eliminare ${selectedRows.size} regole selezionate?`)) {
+                csvData = csvData.filter(r => !selectedRows.has(r.ID));
+                selectedRows.clear();
+                applyFilters();
+                unsavedChanges += selectedRows.size;
+                updateChangesIndicator();
+                showNotification('Regole eliminate!', 'success');
+            }
+        }
+
+        // Salva CSV
+        function saveCSVFile() {
+            const csvContent = generateCSVContent();
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', fileName || 'RegoleListiniDistribuzione.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            unsavedChanges = 0;
+            updateChangesIndicator();
+            showNotification('File CSV salvato!', 'success');
+        }
+
+        // Genera contenuto CSV
+        function generateCSVContent() {
+            const headers = ['ID', 'NomeListino', 'CifraIn', 'CifraOut', 'Margine', 'MargPiu', 'MargMeno', 'Settore', 'RicaricoPercentuale', 'ProvvPiatt', 'MargMenoEstivo', 'MargMenoAS', 'MargMenoInvernale', 'DataCreazione', 'DataModifica'];
+            const csvRows = [headers.join(';')];
+            
+            csvData.forEach(row => {
+                const values = headers.map(header => {
+                    let value = row[header];
+                    if (value === null || value === undefined) {
+                        value = 'null';
+                    }
+                    return value;
+                });
+                csvRows.push(values.join(';'));
+            });
+            
+            return csvRows.join('\n');
+        }
+
+        // Esporta SQL
+        function exportToSQL() {
+            let sqlContent = `-- Script SQL generato da Interfaccia Web
+-- Data: ${new Date().toLocaleString('it-IT')}
+-- Totale regole: ${csvData.length}
+
+-- Backup tabella esistente
+EXEC SP_BackupRegole @BackupName='WebInterface_${new Date().toISOString().slice(0,10)}';
+
+-- Cancella regole esistenti (ATTENZIONE!)
+-- DELETE FROM RegoleListiniDistribuzione;
+
+-- Inserisci nuove regole
+`;
+
+            csvData.forEach(row => {
+                const values = [
+                    `'${row.NomeListino}'`,
+                    row.CifraIn || 'NULL',
+                    row.CifraOut || 'NULL', 
+                    row.Margine || 'NULL',
+                    row.MargPiu || 'NULL',
+                    row.MargMeno || 'NULL',
+                    `'${row.Settore}'`,
+                    row.RicaricoPercentuale || 'NULL',
+                    row.ProvvPiatt || 'NULL',
+                    row.MargMenoEstivo || 'NULL',
+                    row.MargMenoAS || 'NULL',
+                    row.MargMenoInvernale || 'NULL',
+                    4.40, // CostoTrasportoIt
+                    `'24H'` // TipoListForn
+                ];
+                
+                sqlContent += `INSERT INTO RegoleListiniDistribuzione (NomeListino, CifraIn, CifraOut, Margine, MargPiu, MargMeno, Settore, RicaricoPercentuale, ProvvPiatt, MargMenoEstivo, MargMenoAS, MargMenoInvernale, CostoTrasportoIt, TipoListForn) VALUES (${values.join(', ')});\n`;
+            });
+
+            const blob = new Blob([sqlContent], { type: 'text/sql' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'RegoleListiniDistribuzione_Import.sql');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('Script SQL esportato!', 'success');
+        }
+
+        // Applica filtri
+        function applyFilters() {
+            const filterListino = document.getElementById('filterListino').value;
+            const filterSettore = document.getElementById('filterSettore').value;
+            const filterPrezzoMin = parseFloat(document.getElementById('filterPrezzoMin').value) || 0;
+            const filterPrezzoMax = parseFloat(document.getElementById('filterPrezzoMax').value) || Infinity;
+            const filterSearch = document.getElementById('filterSearch').value.toLowerCase();
+
+            filteredData = csvData.filter(row => {
+                return (!filterListino || row.NomeListino === filterListino) &&
+                       (!filterSettore || row.Settore === filterSettore) &&
+                       (row.CifraIn >= filterPrezzoMin) &&
+                       (row.CifraOut <= filterPrezzoMax) &&
+                       (!filterSearch || JSON.stringify(row).toLowerCase().includes(filterSearch));
+            });
+
+            renderTable();
+            updateStatusBar();
+        }
+
+        // Pulisci filtri
+        function clearFilters() {
+            document.getElementById('filterListino').value = '';
+            document.getElementById('filterSettore').value = '';
+            document.getElementById('filterPrezzoMin').value = '';
+            document.getElementById('filterPrezzoMax').value = '';
+            document.getElementById('filterSearch').value = '';
+            applyFilters();
+        }
+
+        // Toggle selezione riga
+        function toggleRowSelection(id) {
+            if (selectedRows.has(id)) {
+                selectedRows.delete(id);
+            } else {
+                selectedRows.add(id);
+            }
+            updateStatusBar();
+        }
+
+        // Toggle seleziona tutto
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll').checked;
+            const checkboxes = document.querySelectorAll('#tableBody input[type="checkbox"]');
+            
+            if (selectAll) {
+                filteredData.forEach(row => selectedRows.add(row.ID));
+            } else {
+                selectedRows.clear();
+            }
+            
+            checkboxes.forEach(cb => cb.checked = selectAll);
+            updateStatusBar();
+        }
+
+        // Aggiorna status bar
+        function updateStatusBar() {
+            document.getElementById('recordCount').textContent = `${filteredData.length} regole visualizzate (${csvData.length} totali)`;
+            document.getElementById('selectedCount').textContent = `${selectedRows.size} selezionate`;
+            document.getElementById('fileInfo').textContent = fileName || 'Nessun file';
+            document.getElementById('lastUpdate').textContent = `Ultimo aggiornamento: ${new Date().toLocaleString('it-IT')}`;
+        }
+
+        // Aggiorna indicatore modifiche
+        function updateChangesIndicator() {
+            const indicator = document.getElementById('changesIndicator');
+            const countEl = document.getElementById('unsavedCount');
+            
+            if (unsavedChanges > 0) {
+                indicator.classList.add('show');
+                countEl.textContent = `${unsavedChanges} modifiche non salvate`;
+            } else {
+                indicator.classList.remove('show');
+                countEl.textContent = '';
+            }
+        }
+
+        // Formatta data
+        function formatDate(dateString) {
+            if (!dateString) return '--';
+            return dateString;
+        }
+
+        // Mostra notifica
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Avvisa per modifiche non salvate
+            window.addEventListener('beforeunload', function(e) {
+                if (unsavedChanges > 0) {
+                    e.preventDefault();
+                    e.returnValue = '';
+                }
+            });
+
+            // Drag & drop support
+            const container = document.querySelector('.container');
+            
+            container.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.style.backgroundColor = '#f0f8ff';
+            });
+            
+            container.addEventListener('dragleave', function(e) {
+                this.style.backgroundColor = '';
+            });
+            
+            container.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.style.backgroundColor = '';
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0 && files[0].name.endsWith('.csv')) {
+                    handleFileLoad(files[0]);
+                } else {
+                    showNotification('Trascinare solo file CSV', 'error');
+                }
+            });
+        });
+    </script>
+</body>
+</html> 
