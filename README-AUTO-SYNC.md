@@ -16,13 +16,33 @@ Questo repository include script per sincronizzare automaticamente tutti i tuoi 
 
 ## 🚀 Come Usare
 
-### Opzione 1: Sincronizzazione Periodica (Raccomandata)
+### 🎯 **OPZIONE RACCOMANDATA: Sincronizzazione Automatica in Background**
+
+**Per avviare la sincronizzazione automatica:**
+```bash
+cd /Users/antonio/Documents/Cursor
+./start-auto-sync.sh
+```
+
+**Per fermare la sincronizzazione:**
+```bash
+./stop-auto-sync.sh
+```
+
+**Per controllare lo stato:**
+```bash
+./status-auto-sync.sh
+```
+
+### 📋 **OPZIONI AVANZATE:**
+
+#### Opzione 1: Sincronizzazione Periodica (Manuale)
 ```bash
 cd /Users/antonio/Documents/Cursor
 ./auto-sync.sh
 ```
 
-### Opzione 2: Sincronizzazione in Tempo Reale
+#### Opzione 2: Sincronizzazione in Tempo Reale
 ```bash
 cd /Users/antonio/Documents/Cursor
 ./auto-sync-realtime.sh
